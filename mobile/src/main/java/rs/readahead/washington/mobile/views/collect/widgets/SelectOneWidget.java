@@ -37,6 +37,7 @@ import java.util.List;
 import rs.readahead.washington.mobile.R;
 import rs.readahead.washington.mobile.util.Util;
 import rs.readahead.washington.mobile.util.StringUtils;
+import timber.log.Timber;
 
 
 /**
@@ -53,6 +54,8 @@ public class SelectOneWidget extends QuestionWidget implements
     public SelectOneWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
+
+        Timber.d("++++ this.formEntryPrompt %s , %s", prompt.getSelectChoices().get(0).getIndex(), prompt.getSelectChoices().get(0).getLabelInnerText() );
         // deleted: SurveyCTO-added support for dynamic select content (from .csv files)
 
         items = prompt.getSelectChoices();

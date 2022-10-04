@@ -26,6 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1947,8 +1949,17 @@ public class DataSource implements IServersRepository, ITellaUploadServersReposi
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
         DataInputStream dis = new DataInputStream(bis);
         FormDef formDef = new FormDef();
+        try {
+            formDef.readExternal(dis, ExtUtil.defaultPrototypes());
+        } catch (Exception e) {
+            StringWriter writer = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(writer);
+            e.printStackTrace(printWriter);
+            printWriter.flush();
 
-        formDef.readExternal(dis, ExtUtil.defaultPrototypes());
+            String stackTrace = writer.toString();
+            Timber.d("++++ deserializeFormDef exception %s", stackTrace);
+        }
         dis.close();
 
         return formDef;

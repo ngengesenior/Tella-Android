@@ -58,6 +58,9 @@ public class WidgetFactory {
 
         switch (fep.getControlType()) {
             case Constants.CONTROL_SELECT_ONE:
+                if (appearance.equals("")){
+                    appearance = "compact";
+                }
                 if (appearance.startsWith("minimal")) {
                     questionWidget = new SpinnerWidget(context, fep);
                 } else {
@@ -106,6 +109,9 @@ public class WidgetFactory {
                 break;
 
             case Constants.CONTROL_SELECT_MULTI:
+                if (appearance.equals("")){
+                    appearance = "compact";
+                }
                 questionWidget = new SelectMultiWidget(context, fep);
                 break;
 
