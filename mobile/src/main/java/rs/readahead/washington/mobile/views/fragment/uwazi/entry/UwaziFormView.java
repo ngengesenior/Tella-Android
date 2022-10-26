@@ -29,7 +29,6 @@ import rs.readahead.washington.mobile.views.fragment.uwazi.widgets.UwaziWidgetFa
 
 @SuppressLint("ViewConstructor")
 public class UwaziFormView extends LinearLayout {
-    public static final String FIELD_LIST = "field-list";
 
     // starter random number for view IDs
     private static final int VIEW_ID = 12961974;
