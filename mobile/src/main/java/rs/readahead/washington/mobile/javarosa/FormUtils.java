@@ -15,6 +15,8 @@ import java.security.MessageDigest;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +36,9 @@ import rs.readahead.washington.mobile.util.Util;
 public class FormUtils {
     private static final String FORM_METADATA_PROPERTY_DELIMITER = " // ";
     private static final String FORM_METADATA_PROPERTY_TIME_FORMAT = "dd-MM-yyyy HH:mm:ss Z";
+
+    private static final String CONTROL_CHAR_REGEX = "[\\p{Cntrl}]";
+    private static final Pattern CONTROL_CHAR_PATTERN = Pattern.compile(CONTROL_CHAR_REGEX);
 
     public static boolean doesTheFieldBeginWith(FormEntryPrompt fep, String prefix) {
         String fepName = fep.getIndex().getReference().getNameLast();
@@ -175,5 +180,16 @@ public class FormUtils {
         ls.add(mdObjectProperty(context, objName, R.string.verification_info_field_location_speed, location.getSpeed() != null ? location.getSpeed().toString() : null));
 
         return TextUtils.join(FORM_METADATA_PROPERTY_DELIMITER, ls);
+    }
+
+    public static String normalizeFormName(String formName, boolean returnNullIfNothingChanged) {
+        if (formName == null) {
+            return null;
+        }
+
+        Matcher matcher = CONTROL_CHAR_PATTERN.matcher(formName);
+        return matcher.find()
+                ? matcher.replaceAll(" ")
+                : (returnNullIfNothingChanged ? null : formName);
     }
 }

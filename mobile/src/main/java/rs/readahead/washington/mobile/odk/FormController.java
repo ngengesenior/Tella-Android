@@ -18,6 +18,8 @@ import static rs.readahead.washington.mobile.odk.FormIndexUtils.getPreviousLevel
 import static rs.readahead.washington.mobile.odk.FormIndexUtils.getRepeatGroupIndex;
 import static rs.readahead.washington.mobile.views.collect.CollectFormView.FIELD_LIST;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -48,14 +50,15 @@ import org.javarosa.xpath.XPathParseTool;
 import org.javarosa.xpath.expr.XPathExpression;
 
 import rs.readahead.washington.mobile.domain.entity.collect.CollectFormInstance;
+import rs.readahead.washington.mobile.javarosa.FormUtils;
 import rs.readahead.washington.mobile.odk.exception.JavaRosaException;
-import org.odk.collect.android.externaldata.ExternalDataUtil;
-import org.odk.collect.android.formentry.audit.AsyncTaskAuditEventWriter;
-import org.odk.collect.android.formentry.audit.AuditConfig;
-import org.odk.collect.android.formentry.audit.AuditEventLogger;
+//import org.odk.collect.android.externaldata.ExternalDataUtil;
+//import org.odk.collect.android.formentry.audit.AsyncTaskAuditEventWriter;
+//import org.odk.collect.android.formentry.audit.f;
+//import org.odk.collect.android.formentry.audit.AuditEventLogger;
 //import org.odk.collect.android.utilities.Appearances;
-import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.FormNameUtils;
+//import org.odk.collect.android.utilities.FileUtils;
+//import org.odk.collect.android.utilities.FormNameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +67,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import rs.readahead.washington.mobile.odk.exception.RepeatsInFieldListException;
 import timber.log.Timber;
 
 /**
@@ -89,6 +93,9 @@ public class FormController {
     public static final boolean STEP_INTO_GROUP = true;
     public static final boolean STEP_OVER_GROUP = false;
 
+    // tracking is edited active instance dirty
+    private String formDefHash;
+
     /**
      * OpenRosa metadata tag names.
      */
@@ -104,7 +111,7 @@ public class FormController {
     /*
      * Store the auditEventLogger object with the form controller state
      */
-    private AuditEventLogger auditEventLogger;
+    //private AuditEventLogger auditEventLogger;
 
     /**
      * OpenRosa metadata of a form instance.
@@ -121,27 +128,36 @@ public class FormController {
 
         public InstanceMetadata(String instanceId, String instanceName, AuditConfig auditConfig) {
             this.instanceId = instanceId;
-            this.instanceName = FormNameUtils.normalizeFormName(instanceName, false);
+            this.instanceName = FormUtils.normalizeFormName(instanceName, false);
             this.auditConfig = auditConfig;
         }
     }
 
-    private final File mediaFolder;
+   // private final File mediaFolder;
     @Nullable
     private File instanceFile;
     private final FormEntryController formEntryController;
     private FormIndex indexWaitingForData;
     private CollectFormInstance collectFormInstance;
 
-    public FormController(File mediaFolder, FormEntryController fec, File instanceFile) {
+    /*public FormController(File mediaFolder, FormEntryController fec, File instanceFile) {
         this.mediaFolder = mediaFolder;
         formEntryController = fec;
         this.instanceFile = instanceFile;
-    }
+    }*/
 
     public FormController(FormEntryController fec, CollectFormInstance instance) {
         formEntryController = fec;
         collectFormInstance = instance;
+    }
+
+    public void initFormChangeTracking() {
+        formDefHash = FormUtils.getFormValuesHash(getFormDef());
+    }
+
+
+    public boolean isFormChanged() {
+        return !TextUtils.equals(formDefHash, FormUtils.getFormValuesHash(getFormDef()));
     }
 
     public CollectFormInstance getCollectFormInstance() {
@@ -153,9 +169,9 @@ public class FormController {
         return formEntryController.getModel().getForm();
     }
 
-    public File getMediaFolder() {
+   /* public File getMediaFolder() {
         return mediaFolder;
-    }
+    }*/
 
     @Nullable
     public File getInstanceFile() {
@@ -173,7 +189,7 @@ public class FormController {
 
     @Nullable
     public String getLastSavedPath() {
-        return mediaFolder != null ? FileUtils.getLastSavedPath(mediaFolder) : null;
+        return null;//mediaFolder != null ? FileUtils.getLastSavedPath(mediaFolder) : null;
     }
 
     public void setIndexWaitingForData(FormIndex index) {
@@ -184,7 +200,7 @@ public class FormController {
         return indexWaitingForData;
     }
 
-    public AuditEventLogger getAuditEventLogger() {
+    /*public AuditEventLogger getAuditEventLogger() {
         if (auditEventLogger == null) {
             AuditConfig auditConfig = getSubmissionMetadata().auditConfig;
 
@@ -196,7 +212,7 @@ public class FormController {
         }
 
         return auditEventLogger;
-    }
+    }*/
 
     /**
      * For logging purposes...

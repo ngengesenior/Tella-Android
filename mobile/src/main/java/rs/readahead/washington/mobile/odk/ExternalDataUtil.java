@@ -33,7 +33,7 @@ import org.javarosa.xpath.parser.XPathSyntaxException;
 //import org.odk.collect.android.application.Collect;
 import rs.readahead.washington.mobile.domain.entity.collect.CollectFormInstance;
 import rs.readahead.washington.mobile.odk.exception.ExternalDataException;
-import org.odk.collect.android.externaldata.handler.ExternalDataHandlerSearch;
+//import org.odk.collect.android.externaldata.handler.ExternalDataHandlerSearch;
 import rs.readahead.washington.mobile.odk.FormController;
 //import org.odk.collect.android.utilities.TranslationHandler;
 
@@ -70,6 +70,7 @@ public final class ExternalDataUtil {
     private static final String COLUMN_SEPARATOR = ",";
     private static final String FALLBACK_COLUMN_SEPARATOR = " ";
     public static final String JR_IMAGES_PREFIX = "jr://images/";
+    public static final String HANDLER_NAME = "search";
 
     private ExternalDataUtil() {
 
@@ -124,7 +125,7 @@ public final class ExternalDataUtil {
                 if (XPathFuncExpr.class.isAssignableFrom(xpathExpression.getClass())) {
                     XPathFuncExpr xpathFuncExpr = (XPathFuncExpr) xpathExpression;
                     if (xpathFuncExpr.id.name.equalsIgnoreCase(
-                            ExternalDataHandlerSearch.HANDLER_NAME)) {
+                            HANDLER_NAME)) {
                         // also check that the args are either 1, 4 or 6.
                         if (xpathFuncExpr.args.length == 1 || xpathFuncExpr.args.length == 4
                                 || xpathFuncExpr.args.length == 6) {
@@ -175,7 +176,8 @@ public final class ExternalDataUtil {
                     // treat this as a static choice
                     returnedChoices.add(selectChoice);
                 } else {
-                    String displayColumns = formEntryPrompt.getSelectChoiceText(selectChoice);
+                    throw new ExternalDataException("ext_search_return_error");
+                   /* String displayColumns = formEntryPrompt.getSelectChoiceText(selectChoice);
                     String imageColumn = formEntryPrompt.getSpecialFormSelectChoiceText(
                             selectChoice, FormEntryCaption.TEXT_FORM_IMAGE);
                     if (imageColumn != null && imageColumn.startsWith(JR_IMAGES_PREFIX)) {
@@ -188,8 +190,8 @@ public final class ExternalDataUtil {
 
                     ExternalDataManager externalDataManager =
                             Collect.getInstance().getExternalDataManager();
-                    FormInstance formInstance = FormController.getActive().getCollectFormInstance();
-                            Collect.getInstance().getFormController().getFormDef().getInstance();
+                    FormInstance formInstance = FormController.getActive().getFormDef().getInstance();
+                            //Collect.getInstance().getFormController().getFormDef().getInstance();
                     EvaluationContext baseEvaluationContext = new EvaluationContext(formInstance);
                     EvaluationContext evaluationContext = new EvaluationContext(
                             baseEvaluationContext, formEntryPrompt.getIndex().getReference());
@@ -209,7 +211,7 @@ public final class ExternalDataUtil {
                         throw new ExternalDataException("ext_search_return_error");
                                 /*TranslationHandler.getString(Collect.getInstance(), R.string.ext_search_return_error,
                                         eval.getClass().getName()));*/
-                    }
+                    //}
                 }
             }
             return returnedChoices;

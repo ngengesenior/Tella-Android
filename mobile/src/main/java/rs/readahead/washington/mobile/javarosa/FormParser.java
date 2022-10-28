@@ -245,8 +245,12 @@ public class FormParser implements IFormParserContract.IFormParser {
     }
 
     private void getViewParameters() {
-        prompts = formController.getQuestionPrompts();
-        groups = formController.getGroupsForCurrentIndex();
+        try {
+            prompts = formController.getQuestionPrompts();
+            groups = formController.getGroupsForCurrentIndex();
+        } catch (Exception e) {
+            Timber.d(e);
+        }
     }
 
     private void findMetadataFields(FormIndex binary, MetadataFieldFunction function) {
@@ -256,9 +260,9 @@ public class FormParser implements IFormParserContract.IFormParser {
             return;
         }
 
-        FormEntryPrompt[] prompts = formController.getQuestionPrompts();
-        for (FormEntryPrompt fep : prompts) {
-            try {
+        try {
+            FormEntryPrompt[] prompts = formController.getQuestionPrompts();
+            for (FormEntryPrompt fep : prompts) {
                 String fepName = fep.getIndex().getReference().getNameLast();
                 if (isGeoPoint(fep) && (locationFieldPrefix + binaryName).equals(fepName)) {
                     function.found(MetadataFieldFunction.Type.LOCATION, fep.getIndex());
@@ -268,9 +272,9 @@ public class FormParser implements IFormParserContract.IFormParser {
                     function.found(MetadataFieldFunction.Type.METADATA, fep.getIndex());
                     break;
                 }
-            } catch (Exception e) {
-                Timber.d(e);
             }
+        } catch (Exception e) {
+            Timber.d(e);
         }
     }
 
