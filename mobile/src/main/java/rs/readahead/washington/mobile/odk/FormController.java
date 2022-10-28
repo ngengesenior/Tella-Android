@@ -14,9 +14,7 @@
 package rs.readahead.washington.mobile.odk;
 
 import static rs.readahead.washington.mobile.odk.Namespaces.XML_OPENDATAKIT_NAMESPACE;
-import static rs.readahead.washington.mobile.odk.FormIndexUtils.getPreviousLevel;
 import static rs.readahead.washington.mobile.odk.FormIndexUtils.getRepeatGroupIndex;
-import static rs.readahead.washington.mobile.views.collect.CollectFormView.FIELD_LIST;
 
 import android.text.TextUtils;
 
@@ -52,22 +50,14 @@ import org.javarosa.xpath.expr.XPathExpression;
 import rs.readahead.washington.mobile.domain.entity.collect.CollectFormInstance;
 import rs.readahead.washington.mobile.javarosa.FormUtils;
 import rs.readahead.washington.mobile.odk.exception.JavaRosaException;
-//import org.odk.collect.android.externaldata.ExternalDataUtil;
-//import org.odk.collect.android.formentry.audit.AsyncTaskAuditEventWriter;
-//import org.odk.collect.android.formentry.audit.f;
-//import org.odk.collect.android.formentry.audit.AuditEventLogger;
-//import org.odk.collect.android.utilities.Appearances;
-//import org.odk.collect.android.utilities.FileUtils;
-//import org.odk.collect.android.utilities.FormNameUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 
-import rs.readahead.washington.mobile.odk.exception.RepeatsInFieldListException;
+import rs.readahead.washington.mobile.views.collect.CollectFormView;
 import timber.log.Timber;
 
 /**
@@ -393,15 +383,23 @@ public class FormController {
     private boolean groupIsFieldList(FormIndex index) {
         // if this isn't a group, return right away
         IFormElement element = formEntryController.getModel().getForm().getChild(index);
-        if (!(element instanceof GroupDef) || element.getAppearanceAttr() == null) {
+        if (!(element instanceof GroupDef)) {
             return false;
         }
 
-        return element.getAppearanceAttr().toLowerCase(Locale.ENGLISH).contains(FIELD_LIST);
+        GroupDef gd = (GroupDef) element; // exceptions?
+        return (CollectFormView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
     }
 
     private boolean repeatIsFieldList(FormIndex index) {
-        return groupIsFieldList(index);
+        // if this isn't a group, return right away
+        IFormElement element = formEntryController.getModel().getForm().getChild(index);
+        if (!(element instanceof GroupDef)) {
+            return false;
+        }
+
+        GroupDef gd = (GroupDef) element; // exceptions?
+        return (CollectFormView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr()));
     }
 
     /**
@@ -424,11 +422,12 @@ public class FormController {
      * Precondition: there is a question at the given FormIndex.
      */
     public boolean usesDatabaseExternalDataFeature(@NonNull FormIndex index) {
-        String queryAttribute = getFormDef().getChild(index).getAdditionalAttribute(null, "query");
+        return false;
+        /*String queryAttribute = getFormDef().getChild(index).getAdditionalAttribute(null, "query");
         String appearanceAttribute = getAppearanceAttr(index);
 
         return appearanceAttribute != null && ExternalDataUtil.SEARCH_FUNCTION_REGEX.matcher(appearanceAttribute).find()
-                || queryAttribute != null && queryAttribute.length() > 0;
+                || queryAttribute != null && queryAttribute.length() > 0;*/
     }
 
     /**
@@ -436,7 +435,7 @@ public class FormController {
      *
      * @return true if index is in a "field-list". False otherwise.
      */
-    public boolean indexIsInFieldList(FormIndex index) {
+    private boolean indexIsInFieldList(FormIndex index) {
         int event = getEvent(index);
         if (event == FormEntryController.EVENT_QUESTION) {
             // caption[0..len-1]
@@ -447,21 +446,17 @@ public class FormController {
                 // no group
                 return false;
             }
-            // If at least one of the groups you are inside is a field list, your index is in a field list
-            for (FormEntryCaption caption : captions) {
-                if (groupIsFieldList(caption.getIndex())) {
-                    return true;
-                }
-            }
-            return false;
+            FormEntryCaption grp = captions[captions.length - 2];
+            return groupIsFieldList(grp.getIndex());
         } else if (event == FormEntryController.EVENT_GROUP) {
             return groupIsFieldList(index);
         } else if (event == FormEntryController.EVENT_REPEAT) {
             return repeatIsFieldList(index);
         } else {
+            // right now we only test Questions and Groups. Should we also handle
+            // repeats?
             return false;
         }
-
     }
 
     /**
@@ -512,13 +507,10 @@ public class FormController {
      * @return ANSWER_OK and leave index unchanged or change index to bad value and return error
      * type.
      */
-    public int validateAnswers(boolean markCompleted) throws JavaRosaException {
+    public int validateAnswers(Boolean markCompleted) throws JavaRosaException {
         ValidateOutcome outcome = getFormDef().validate(markCompleted);
         if (outcome != null) {
             this.jumpToIndex(outcome.failedPrompt);
-            if (indexIsInFieldList()) {
-                stepToPreviousScreenEvent();
-            }
             return outcome.outcome;
         }
         return FormEntryController.ANSWER_OK;
@@ -536,11 +528,6 @@ public class FormController {
         try {
             return formEntryController.saveAnswer(index, data, true);
         } catch (Exception e) {
-            String dataType = data != null ? data.getClass().toString() : null;
-            String ref = index != null ? index.getReference().toString() : null;
-            Timber.w("Error saving answer of type %s with ref %s for index %s",
-                    dataType, ref, index);
-
             throw new JavaRosaException(e);
         }
     }
@@ -553,7 +540,7 @@ public class FormController {
     public int stepToNextEvent(boolean stepIntoGroup) {
         if ((getEvent() == FormEntryController.EVENT_GROUP
                 || getEvent() == FormEntryController.EVENT_REPEAT)
-                && indexIsInFieldList() && !isGroupEmpty() && !stepIntoGroup) {
+                && indexIsInFieldList() && !stepIntoGroup) {
             return stepOverGroup();
         } else {
             return formEntryController.stepToNextEvent();
@@ -564,15 +551,38 @@ public class FormController {
      * If using a view like HierarchyView that doesn't support multi-question per screen, step over
      * the group represented by the FormIndex.
      */
-    public int stepOverGroup() {
+    private int stepOverGroup() {
+        ArrayList<FormIndex> indicies = new ArrayList<FormIndex>();
         GroupDef gd =
                 (GroupDef) formEntryController.getModel().getForm()
                         .getChild(getFormIndex());
-        List<FormIndex> indices = getIndicesForGroup(gd);
+        FormIndex idxChild =
+                formEntryController.getModel().incrementIndex(
+                        getFormIndex(), true); // descend into group
+        for (int i = 0; i < gd.getChildren().size(); i++) {
+            indicies.add(idxChild);
+            // don't descend
+            idxChild = formEntryController.getModel().incrementIndex(idxChild, false);
+        }
 
         // jump to the end of the group
-        formEntryController.jumpToIndex(indices.get(indices.size() - 1));
+        formEntryController.jumpToIndex(indicies.get(indicies.size() - 1));
         return stepToNextEvent(STEP_OVER_GROUP);
+    }
+
+    /**
+     * used to go up one level in the formIndex. That is, if you're at 5_0, 1 (the second question
+     * in a repeating group), this method will return a FormInex of 5_0 (the start of the repeating
+     * group). If your at index 16 or 5_0, this will return null;
+     *
+     * @return index
+     */
+    public FormIndex stepIndexOut(FormIndex index) {
+        if (index.isTerminal()) {
+            return null;
+        } else {
+            return new FormIndex(stepIndexOut(index.getNextLevel()), index);
+        }
     }
 
     /**
@@ -595,17 +605,28 @@ public class FormController {
                     event = stepToPreviousEvent();
                 }
 
-                // Handle nested field-list group
+                // Work-around for broken field-list handling from 1.1.7 which breaks either
+                // build-generated forms or XLSForm-generated forms.  If the current group
+                // is a GROUP with field-list and it is nested within a group or repeat with just
+                // this containing group, and that is also a field-list, then return the parent
+                // group.
                 if (getEvent() == FormEntryController.EVENT_GROUP) {
                     FormIndex currentIndex = getFormIndex();
-
-                    if (groupIsFieldList(currentIndex)) {
-                        // jump to outermost containing field-list
-                        FormEntryCaption[] fclist = this.getCaptionHierarchy(currentIndex);
-                        for (FormEntryCaption caption : fclist) {
-                            if (groupIsFieldList(caption.getIndex())) {
-                                formEntryController.jumpToIndex(caption.getIndex());
-                                break;
+                    IFormElement element = formEntryController.getModel().getForm().getChild(
+                            currentIndex);
+                    if (element instanceof GroupDef) {
+                        GroupDef gd = (GroupDef) element;
+                        if (CollectFormView.FIELD_LIST.equalsIgnoreCase(gd.getAppearanceAttr())) {
+                            // OK this group is a field-list... see what the parent is...
+                            FormEntryCaption[] fclist = this.getCaptionHierarchy(currentIndex);
+                            if (fclist.length > 1) {
+                                FormEntryCaption fc = fclist[fclist.length - 2];
+                                GroupDef pd = (GroupDef) fc.getFormElement();
+                                if (pd.getChildren().size() == 1
+                                        && CollectFormView.FIELD_LIST.equalsIgnoreCase(
+                                        pd.getAppearanceAttr())) {
+                                    formEntryController.jumpToIndex(fc.getIndex());
+                                }
                             }
                         }
                     }
@@ -633,15 +654,13 @@ public class FormController {
                     switch (event) {
                         case FormEntryController.EVENT_QUESTION:
                         case FormEntryController.EVENT_END_OF_FORM:
+                            break group_skip;
                         case FormEntryController.EVENT_PROMPT_NEW_REPEAT:
                             break group_skip;
                         case FormEntryController.EVENT_GROUP:
                         case FormEntryController.EVENT_REPEAT:
-                            try {
-                                if (indexIsInFieldList() && getQuestionPrompts().length != 0) {
-                                    break group_skip;
-                                }
-                            } catch (RepeatsInFieldListException e) {
+                            if (indexIsInFieldList()
+                                    && getQuestionPrompts().length != 0) {
                                 break group_skip;
                             }
                             // otherwise it's not a field-list group, so just skip it
@@ -651,7 +670,8 @@ public class FormController {
                             // skip repeat junctures until we implement them
                             break;
                         default:
-                            Timber.w("JavaRosa added a new EVENT type and didn't tell us... shame on them.");
+                            Timber.w("JavaRosa added a new EVENT type and didn't tell us... shame "
+                                    + "on them.");
                             break;
                     }
                 } while (event != FormEntryController.EVENT_END_OF_FORM);
@@ -684,37 +704,26 @@ public class FormController {
      * or to the start of the form.
      */
     public int stepToOuterScreenEvent() {
-        FormIndex index = getFormIndex();
+        FormIndex index = stepIndexOut(getFormIndex());
+        int currentEvent = getEvent();
 
-        // Step out once to begin with if we're coming from a question.
-        if (getEvent() == FormEntryController.EVENT_QUESTION) {
-            index = getPreviousLevel(index);
-        }
-
-        // Save where we started from.
-        FormIndex startIndex = index;
-
-        // Step out once more no matter what.
-        index = getPreviousLevel(index);
-
-        // Step out of any group indexes that are present, unless they're visible.
+        // Step out of any group indexes that are present.
         while (index != null
-                && getEvent(index) == FormEntryController.EVENT_GROUP
-                && !isDisplayableGroup(index)) {
-            index = getPreviousLevel(index);
+                && getEvent(index) == FormEntryController.EVENT_GROUP) {
+            index = stepIndexOut(index);
         }
 
         if (index == null) {
             jumpToIndex(FormIndex.createBeginningOfFormIndex());
         } else {
-            if (isDisplayableGroup(startIndex)) {
-                // We were at a displayable group, so stepping back brought us to the previous level
+            if (currentEvent == FormEntryController.EVENT_REPEAT) {
+                // We were at a repeat, so stepping back brought us to then previous level
                 jumpToIndex(index);
             } else {
                 // We were at a question, so stepping back brought us to either:
-                // The beginning, or the start of a displayable group. So we need to step
-                // out again to go past the group.
-                index = getPreviousLevel(index);
+                // The beginning. or The start of a repeat. So we need to step
+                // out again to go passed the repeat.
+                index = stepIndexOut(index);
                 if (index == null) {
                     jumpToIndex(FormIndex.createBeginningOfFormIndex());
                 } else {
@@ -773,21 +782,28 @@ public class FormController {
     /**
      * @return FailedConstraint of first failed constraint or null if all questions were saved.
      */
-    public FailedConstraint saveAllScreenAnswers(HashMap<FormIndex, IAnswerData> answers, boolean evaluateConstraints) throws JavaRosaException {
+    public FailedConstraint saveAllScreenAnswers(LinkedHashMap<FormIndex, IAnswerData> answers,
+                                                 boolean evaluateConstraints) throws JavaRosaException {
         if (currentPromptIsQuestion()) {
             for (FormIndex index : answers.keySet()) {
-                FailedConstraint failedConstraint = saveOneScreenAnswer(
-                        index,
-                        answers.get(index),
-                        evaluateConstraints
-                );
-
-                if (failedConstraint != null) {
-                    return failedConstraint;
+                // Within a group, you can only save for question events
+                if (getEvent(index) == FormEntryController.EVENT_QUESTION) {
+                    int saveStatus;
+                    IAnswerData answer = answers.get(index);
+                    if (evaluateConstraints) {
+                        saveStatus = answerQuestion(index, answer);
+                        if (saveStatus != FormEntryController.ANSWER_OK) {
+                            return new FailedConstraint(index, saveStatus);
+                        }
+                    } else {
+                        saveAnswer(index, answer);
+                    }
+                } else {
+                    Timber.w("Attempted to save an index referencing something other than a question: %s",
+                            index.getReference().toString());
                 }
             }
         }
-
         return null;
     }
 
@@ -923,25 +939,60 @@ public class FormController {
      * <p>
      * The array has a single element if there is a question at this {@link FormIndex} or multiple
      * elements if there is a group.
-     *
-     * @throws RepeatsInFieldListException if there is a group at this {@link FormIndex} and it contains
-     *                          elements that are not questions or regular (non-repeat) groups.
      */
-    public FormEntryPrompt[] getQuestionPrompts() throws RepeatsInFieldListException {
+    public FormEntryPrompt[] getQuestionPrompts() throws RuntimeException {
+
+        ArrayList<FormIndex> indicies = new ArrayList<FormIndex>();
+        FormIndex currentIndex = getFormIndex();
+
         // For questions, there is only one.
         // For groups, there could be many, but we set that below
-        FormEntryPrompt[] questions = new FormEntryPrompt[0];
+        FormEntryPrompt[] questions = new FormEntryPrompt[1];
 
-        IFormElement element = formEntryController.getModel().getForm().getChild(getFormIndex());
+        IFormElement element = formEntryController.getModel().getForm().getChild(currentIndex);
         if (element instanceof GroupDef) {
             GroupDef gd = (GroupDef) element;
+            // descend into group
+            FormIndex idxChild = formEntryController.getModel().incrementIndex(currentIndex, true);
+
+            if (gd.getChildren().size() == 1 && getEvent(idxChild)
+                    == FormEntryController.EVENT_GROUP) {
+                // if we have a group definition within a field-list attribute group, and this is
+                // the
+                // only child in the group, check to see if it is also a field-list appearance.
+                // If it is, then silently recurse into it to pick up its elements.
+                // Work-around for the inconsistent treatment of field-list groups and repeats in
+                // 1.1.7 that
+                // either breaks forms generated by build or breaks forms generated by XLSForm.
+                IFormElement nestedElement = formEntryController.getModel().getForm().getChild(
+                        idxChild);
+                if (nestedElement instanceof GroupDef) {
+                    GroupDef nestedGd = (GroupDef) nestedElement;
+                    if (CollectFormView.FIELD_LIST.equalsIgnoreCase(nestedGd.getAppearanceAttr())) {
+                        gd = nestedGd;
+                        idxChild = formEntryController.getModel().incrementIndex(idxChild, true);
+                    }
+                }
+            }
+
+            for (int i = 0; i < gd.getChildren().size(); i++) {
+                indicies.add(idxChild);
+                // don't descend
+                idxChild = formEntryController.getModel().incrementIndex(idxChild, false);
+            }
+
             // we only display relevant questions
-            List<FormEntryPrompt> questionList = new ArrayList<>();
-            for (FormIndex index : getIndicesForGroup(gd)) {
+            ArrayList<FormEntryPrompt> questionList = new ArrayList<FormEntryPrompt>();
+            for (int i = 0; i < indicies.size(); i++) {
+                FormIndex index = indicies.get(i);
+
                 if (getEvent(index) != FormEntryController.EVENT_QUESTION) {
-                    throw new RepeatsInFieldListException("Repeats in 'field-list' groups " +
-                            "are not supported. Please update the form design to remove the " +
-                            "following repeat from a field list: " + index.getReference().toString(false));
+                    String errorMsg =
+                            "Only questions are allowed in 'field-list'.  Bad node is: "
+                                    + index.getReference().toString(false);
+                    RuntimeException e = new RuntimeException(errorMsg);
+                    Timber.e(errorMsg);
+                    throw e;
                 }
 
                 // we only display relevant questions
@@ -952,8 +1003,7 @@ public class FormController {
                 questionList.toArray(questions);
             }
         } else {
-            // We have a question, so just get the one prompt
-            questions = new FormEntryPrompt[1];
+            // We have a quesion, so just get the one prompt
             questions[0] = getQuestionPrompt();
         }
 
