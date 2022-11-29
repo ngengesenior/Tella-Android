@@ -60,7 +60,9 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':javarosa')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    implementation group: 'joda-time', name: 'joda-time', version: '2.9.9'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':tella-vault')
@@ -120,7 +122,7 @@ dependencies {
     implementation 'com.burgstaller:okhttp-digest:1.15'
 
     // collect
-    implementation group: 'org.getodk', name: 'javarosa', version: '3.0.3'
+    //implementation group: 'org.getodk', name: 'javarosa', version: '3.0.3'
     //implementation "org.opendatakit:opendatakit-javarosa:2.4.0"
     implementation 'net.sf.kxml:kxml2:2.3.0'
     implementation "commons-io:commons-io:2.6"

@@ -1,0 +1,23 @@
+# java
+*.class
+
+# gradle
+.gradle
+build
+gradle.properties
+
+# intellij
+.idea
+*.iml
+out
+
+# mvn
+target
+secrets.xml
+
+# logging
+logback.xml
+logback-test.xml
+
+# macOS
+.DS_Store

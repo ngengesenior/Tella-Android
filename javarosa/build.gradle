@@ -1,0 +1,115 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'jacoco'
+    id "me.champeau.gradle.jmh" version "0.5.0"
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main.java.srcDirs = ['src/main/java']
+    main.resources.srcDirs = ['src/main/resources']
+    test.java.srcDirs = ['src/test/java']
+    test.resources.srcDirs = ['src/test/resources']
+}
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+compileJava {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+compileTestJava {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
+
+dependencies {
+    // Be sure to update dependencies in pom.xml to match
+    implementation group: 'joda-time', name: 'joda-time', version: '2.9.9'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compileOnly group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'net.sf.kxml', name: 'kxml2', version: '2.3.0'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+// Required to use fileExtensions property in checkstyle file
+checkstyle {
+    toolVersion = '7.6.1'
+}
+
+jar {
+    baseName = 'javarosa'
+    // Be sure to update version in pom.xml to match
+    // snapshot release = x.x.x-SNAPSHOT
+    // production release = x.x.x
+    version = '3.0.3'
+    archiveName = baseName + '-' + version + '.jar'
+
+    manifest {
+        attributes 'Manifest-Version': "$jar.version"
+    }
+}
+
+// Useful for testing
+task explodedJar(type: Copy) {
+    into "$buildDir/libs/$jar.baseName $jar.version"
+    with jar
+}
+
+// TODO: does not build UML diagrams
+javadoc {
+    failOnError = false
+}
+
+jmhJar.doFirst {
+    new File("build/resources/test").mkdirs()
+}
+
+jmh {
+    exclude = ["(BenchmarkTemplate)"]
+    threads = 1
+    fork = 1
+    timeout = '10s'
+    warmup = '2s'
+    warmupIterations = 10
+    warmupBatchSize = 1
+    warmupForks = 1
+    iterations = 20
+    timeOnIteration = '2s'
+    timeUnit = 's'
+    benchmarkMode = ['avgt','ss']
+    includeTests = true
+    resultFormat = 'CSV'
+    forceGC = true
+
+    duplicateClassesStrategy = 'warn'
+}
+
+/**
+ * Returns the value of a property of this build if it exists. Otherwise,
+ * returns the provided devault value.
+ *
+ * This method is used as a safe way to get properties that might or might not
+ * be defined in the gradle.properties file.
+ */
+String getValue(String key, String defaultValue) {
+    if (this.hasProperty(key))
+        return this.getProperty(key)
+    return defaultValue
+}
+
+apply from: 'android-api-level-checker.gradle'
