@@ -164,7 +164,7 @@ public class XFormAnswerDataParser {
     }
 
     private static void logGeoCreateError(Class geoType, String trimmedText, Exception exception) {
-        logger.warn("Could not create {} from \"{}\": {}", geoType.getSimpleName(), trimmedText, exception.toString());
+        //logger.warn("Could not create {} from \"{}\": {}", geoType.getSimpleName(), trimmedText, exception.toString());
     }
 
     private static List<Selection> getSelections(String text, QuestionDef q) {

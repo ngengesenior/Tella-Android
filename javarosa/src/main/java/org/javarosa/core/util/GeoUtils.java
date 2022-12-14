@@ -99,10 +99,10 @@ public final class GeoUtils {
     }
 
     private static void logDistance(LatLong p1, LatLong p2, double distance, double totalDistance) {
-        logger.trace("\t{}\t{}\t{}\t{}\t{}\t{}",
+        /*logger.trace("\t{}\t{}\t{}\t{}\t{}\t{}",
             p1.latitude, p1.longitude,
             p2.latitude, p2.longitude,
-            distance, totalDistance);
+            distance, totalDistance);*/
     }
 
     private static Double calculateAreaInSquareMeters(double x1, double x2, double y1, double y2) {

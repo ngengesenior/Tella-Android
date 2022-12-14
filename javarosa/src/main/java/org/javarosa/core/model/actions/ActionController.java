@@ -81,7 +81,7 @@ public class ActionController implements Externalizable {
     public void triggerActionsFromEvent(String event, FormDef model, TreeReference contextForAction,
                                         ActionResultProcessor resultProcessor) {
         for (Action action : getListenersForEvent(event)) {
-            log.info("Event {} triggering action {} in context {}", event, action.getName(), contextForAction);
+           //log.info("Event {} triggering action {} in context {}", event, action.getName(), contextForAction);
             TreeReference refSetByAction = action.processAction(model, contextForAction);
             if (resultProcessor != null && refSetByAction != null) {
                 resultProcessor.processResultOfAction(refSetByAction, event);

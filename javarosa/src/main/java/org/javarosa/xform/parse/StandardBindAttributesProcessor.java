@@ -144,7 +144,7 @@ class StandardBindAttributesProcessor {
         try {
             xPathConditional = new XPathConditional(xpath);
         } catch (XPathSyntaxException xse) {
-            logger.error("XForm Parse Error: Encountered a problem with {} condition for node [{}] at line: {}{}", prettyType, contextRef.getReference().toString(), xpath, xse.getMessage());
+           // logger.error("XForm Parse Error: Encountered a problem with {} condition for node [{}] at line: {}{}", prettyType, contextRef.getReference().toString(), xpath, xse.getMessage());
             throw new XFormParseException("Encountered a problem with " + prettyType + " condition for node [" +
                 contextRef.getReference().toString() + "] at line: " + xpath + ", " + xse.getMessage());
         }

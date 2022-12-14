@@ -45,13 +45,13 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
     public XPathEqExpr(boolean equal, XPathExpression a, XPathExpression b) {
         super(a, b);
         this.equal = equal;
-        logger.debug("XPathEqExpr{}({}, {}, {})", id(), equal, a, b);
+        //logger.debug("XPathEqExpr{}({}, {}, {})", id(), equal, a, b);
     }
 
     @Override
     public Object eval(DataInstance model, EvaluationContext evalContext) {
-        logger.debug("XPathEqExpr{}.eval starting. model: {}, candidate: {}, expecting equal: {}", id(), model,
-            evalContext.candidateValue == null ? "None" : evalContext.candidateValue.getDisplayText(), equal);
+       /* logger.debug("XPathEqExpr{}.eval starting. model: {}, candidate: {}, expecting equal: {}", id(), model,
+            evalContext.candidateValue == null ? "None" : evalContext.candidateValue.getDisplayText(), equal);*/
         final Object aval = unpack(a.eval(model, evalContext));
         final Object bval = unpack(b.eval(model, evalContext));
         final boolean eq;
@@ -69,7 +69,7 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
         }
 
         boolean result = equal == eq;
-        logger.debug("XPathEqExpr{}.eval returning {}. a: {}, b: {}", id(), result, aval, bval);
+        //logger.debug("XPathEqExpr{}.eval returning {}. a: {}, b: {}", id(), result, aval, bval);
         return result;
     }
 
@@ -85,7 +85,7 @@ public class XPathEqExpr extends XPathBinaryOpExpr {
     public void readExternal(DataInputStream in, PrototypeFactory pf) throws IOException, DeserializationException {
         equal = ExtUtil.readBool(in);
         super.readExternal(in, pf);
-        logger.debug("XPathEqExpr{}.readExternal {}, {}, {}", id(), a, b, equal);
+        //logger.debug("XPathEqExpr{}.readExternal {}, {}, {}", id(), a, b, equal);
     }
 
     @Override

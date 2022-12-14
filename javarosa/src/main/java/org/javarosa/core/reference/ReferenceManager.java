@@ -47,7 +47,7 @@ public class ReferenceManager {
             translators.clear();
             factories.clear();
             sessionTranslators.clear();
-            logger.debug("reset translators ({}), session translators ({}), and factories ({})", t, st, f);
+            //logger.debug("reset translators ({}), session translators ({}), and factories ({})", t, st, f);
         }
     }
 

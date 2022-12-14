@@ -202,7 +202,7 @@ public class MemoryUtils {
 
         //For now, just print out the profile. Eventually we should compress it and output it in a useful format.
         if(succeeded) {
-            logger.info("Acquired memory profile for {} of the {} available bytes, with {} traces", memoryAccountedFor, memory, currentCount);
+           // logger.info("Acquired memory profile for {} of the {} available bytes, with {} traces", memoryAccountedFor, memory, currentCount);
             for(int i = 0 ; i < currentCount * 2 ; i+=2) {
                 logger.info("Address: {} -> {}", memoryProfile[i], memoryProfile[i + 1]);
             }

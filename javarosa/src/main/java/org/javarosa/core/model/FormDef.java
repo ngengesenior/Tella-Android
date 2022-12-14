@@ -1583,6 +1583,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
     }
 
     private void attachControlsToInstanceData(TreeElement node) {
+        logger.info("++++ attachControlsToInstanceData");
         for (int i = 0; i < node.getNumChildren(); i++) {
             attachControlsToInstanceData(node.getChildAt(i));
         }
@@ -1600,7 +1601,7 @@ public class FormDef implements IFormElement, Localizable, Persistable, IMetaDat
             QuestionDef q = findQuestionByRef(node.getRef(), this);
             if (q == null) {
                 throw new RuntimeException(
-                    "FormDef.attachControlsToInstanceData: can't find question to link");
+                    "FormDef.attachControlsToInstanceData: can't find question to link " + selections.get(0).toString());
             }
 
             if (q.getDynamicChoices() != null) {
