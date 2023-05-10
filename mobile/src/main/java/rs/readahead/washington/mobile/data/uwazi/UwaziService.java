@@ -4,8 +4,6 @@ import android.os.Build;
 
 import com.burgstaller.okhttp.AuthenticationCacheInterceptor;
 import com.burgstaller.okhttp.digest.CachingAuthenticator;
-import com.ihsanbal.logging.Level;
-import com.ihsanbal.logging.LoggingInterceptor;
 
 import java.net.CookieManager;
 import java.net.Proxy;
@@ -22,7 +20,6 @@ import okhttp3.CookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.TlsVersion;
-import okhttp3.internal.platform.Platform;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -37,7 +34,7 @@ public class UwaziService {
     private static UwaziService instance;
     private final Retrofit retrofit;
     private final static Map<String, CachingAuthenticator> authCache = new ConcurrentHashMap<>();
-    private volatile static CookieJar cookieJar = new QuotePreservingCookieJar(new CookieManager());
+    private static final CookieJar cookieJar = new QuotePreservingCookieJar(new CookieManager());
 
     // todo: keep it like this for now, lets see what we need..
     public static synchronized UwaziService getInstance() {
@@ -82,11 +79,6 @@ public class UwaziService {
         return new UwaziService.Builder(builder).build();
     }
 
-    public static synchronized void clearCache() {
-        cookieJar = new QuotePreservingCookieJar(new CookieManager());
-        authCache.clear();
-    }
-
     private UwaziService(Retrofit retrofit) {
         this.retrofit = retrofit;
     }
@@ -114,19 +106,10 @@ public class UwaziService {
                     .cookieJar(new UvCookieJar());
 
 
-            LoggingInterceptor logger = new LoggingInterceptor.Builder()
-                    .loggable(true)
-                    .setLevel(Level.BASIC)
-                    .log(Platform.INFO)
-                    .request("Request")
-                    .response("Response")
-                    .build();
-
-
             if (BuildConfig.DEBUG) {
                 okClientBuilder.addNetworkInterceptor(
-                        new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
-                .addInterceptor(logger);
+                        new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC));
+
                 // or BODY
             }
         }

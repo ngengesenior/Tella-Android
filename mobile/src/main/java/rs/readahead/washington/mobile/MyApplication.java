@@ -16,7 +16,6 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.multidex.MultiDexApplication;
 
 import com.bumptech.glide.Glide;
-import com.evernote.android.job.JobManager;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.hzontal.tella_locking_ui.TellaKeysUI;
 import com.hzontal.tella_locking_ui.common.CredentialsCallback;
@@ -58,7 +57,6 @@ import rs.readahead.washington.mobile.util.C;
 import rs.readahead.washington.mobile.util.CleanInsightUtils;
 import rs.readahead.washington.mobile.util.LocaleManager;
 import rs.readahead.washington.mobile.util.TellaUpgrader;
-import rs.readahead.washington.mobile.util.jobs.TellaJobCreator;
 import rs.readahead.washington.mobile.views.activity.ExitActivity;
 import rs.readahead.washington.mobile.views.activity.MainActivity;
 import rs.readahead.washington.mobile.views.activity.onboarding.OnBoardingActivity;
