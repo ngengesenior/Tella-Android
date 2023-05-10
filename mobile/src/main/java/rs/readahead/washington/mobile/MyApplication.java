@@ -3,7 +3,6 @@ package rs.readahead.washington.mobile;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -195,10 +194,6 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         // MediaFile init
         MediaFileHandler.init(this);
         MediaFileHandler.emptyTmp(this);
-
-        // evernote jobs
-        JobManager.create(this).addJobCreator(new TellaJobCreator());
-        //JobManager.instance().cancelAll(); // for testing, kill them all for now..
 
         // Collect
         PropertyManager mgr = new PropertyManager();
