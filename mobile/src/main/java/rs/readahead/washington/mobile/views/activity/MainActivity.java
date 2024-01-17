@@ -372,6 +372,16 @@ public class MainActivity extends MetadataActivity implements
 
     }
 
+    @Override
+    public void onCountResourcesServersEnded(Long num) {
+
+    }
+
+    @Override
+    public void onCountResourcesServersFailed(Throwable throwable) {
+
+    }
+
     private void stopPresenter() {
         if (homeScreenPresenter != null) {
             homeScreenPresenter.destroy();

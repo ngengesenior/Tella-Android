@@ -12,6 +12,8 @@ public class IHomeScreenPresenterContract {
         void onCountCollectServersFailed(Throwable throwable);
         void onCountUwaziServersEnded(Long num);
         void onCountUwaziServersFailed(Throwable throwable);
+        void onCountResourcesServersEnded(Long num);
+        void onCountResourcesServersFailed(Throwable throwable);
     }
 
     public interface IPresenter extends IBasePresenter {
@@ -19,5 +21,6 @@ public class IHomeScreenPresenterContract {
         void countTUServers();
         void countCollectServers();
         void countUwaziServers();
+        void countResourcesServers();
     }
 }

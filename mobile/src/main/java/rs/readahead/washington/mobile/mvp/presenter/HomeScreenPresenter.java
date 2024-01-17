@@ -86,6 +86,22 @@ public class HomeScreenPresenter implements IHomeScreenPresenterContract.IPresen
     }
 
     @Override
+    public void countResourcesServers() {
+        disposable.add(keyDataSource.getDataSource()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapSingle((Function<DataSource, SingleSource<Long>>) DataSource::countTUServers)
+                .subscribe(
+                        num -> view.onCountResourcesServersEnded(num),
+                        throwable -> {
+                            FirebaseCrashlytics.getInstance().recordException(throwable);
+                            view.onCountResourcesServersFailed(throwable);
+                        }
+                )
+        );
+    }
+
+    @Override
     public void countCollectServers() {
         disposable.add(keyDataSource.getDataSource()
                 .subscribeOn(Schedulers.io())
