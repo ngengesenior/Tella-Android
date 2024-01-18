@@ -26,6 +26,7 @@ import rs.readahead.washington.mobile.data.sharedpref.Preferences
 import rs.readahead.washington.mobile.domain.entity.EntityStatus
 import rs.readahead.washington.mobile.domain.entity.UploadProgressInfo
 import rs.readahead.washington.mobile.domain.entity.collect.FormMediaFileStatus
+import rs.readahead.washington.mobile.domain.entity.reports.ListResourceResult
 import rs.readahead.washington.mobile.domain.entity.reports.ReportInstance
 import rs.readahead.washington.mobile.domain.entity.reports.ReportPostResult
 import rs.readahead.washington.mobile.domain.entity.reports.TellaReportServer
@@ -445,6 +446,10 @@ class ReportsRepositoryImp @Inject internal constructor(
 
     override fun cleanup() {
         disposables.clear()
+    }
+
+    override fun getResourcesResult(server: TellaReportServer): Single<ListResourceResult> {
+        TODO("Not yet implemented")
     }
 
     /**

@@ -13,7 +13,6 @@ import rs.readahead.washington.mobile.MyApplication
 import rs.readahead.washington.mobile.bus.SingleLiveEvent
 import rs.readahead.washington.mobile.data.database.DataSource
 import rs.readahead.washington.mobile.domain.entity.EntityStatus
-import rs.readahead.washington.mobile.domain.entity.UploadProgressInfo
 import rs.readahead.washington.mobile.domain.entity.collect.FormMediaFile
 import rs.readahead.washington.mobile.domain.entity.collect.FormMediaFileStatus
 import rs.readahead.washington.mobile.domain.entity.reports.ReportInstance
@@ -45,6 +44,9 @@ class ReportsViewModel @Inject constructor(
     private val disposables = CompositeDisposable()
 
     private val _progress = MutableLiveData<Boolean>()
+
+    private val _resources = MutableLiveData<List<Any>>()
+    val templates: LiveData<List<Any>> get() = _resources
     val progress: LiveData<Boolean> get() = _progress
     private val _serversList = MutableLiveData<List<TellaReportServer>>()
     val serversList: LiveData<List<TellaReportServer>> get() = _serversList

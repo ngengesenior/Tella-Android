@@ -304,10 +304,14 @@ class HomeVaultFragment : BaseFragment(), VaultClickListener, IHomeVaultPresente
                 nav().navigate(R.id.action_homeScreen_to_forms_screen)
             }
             ServerType.TELLA_UPLOAD -> {
-                nav().navigate(R.id.action_homeScreen_to_reports_screen)
+                //nav().navigate(R.id.action_homeScreen_to_reports_screen)
+                nav().navigate(R.id.action_homeScreen_to_resources_screen)
             }
             ServerType.UWAZI -> {
                 nav().navigate(R.id.action_homeScreen_to_uwazi_screen)
+            }
+            ServerType.TELLA_RESORCES -> {
+                nav().navigate(R.id.action_homeScreen_to_resources_screen)
             }
             else -> {}
         }
