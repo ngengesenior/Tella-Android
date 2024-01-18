@@ -57,4 +57,11 @@ interface ReportsApiService {
         @Url url: String,
         @Header(AUTHORIZATION_HEADER) access_token: String
     ): Single<Response<Void>>
+
+    @GET
+    fun getResources(
+        @Url
+        url: String,
+        @Header(AUTHORIZATION_HEADER) access_token: String
+    ): Single<ResourcesGetResponse>
 }

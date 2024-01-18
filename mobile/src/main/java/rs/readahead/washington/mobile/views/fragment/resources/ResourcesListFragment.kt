@@ -26,29 +26,27 @@ BaseBindingFragment<FragmentResourcesListBinding>(FragmentResourcesListBinding::
     }
     override fun onResume() {
         super.onResume()
-        model.listTemplates()
+        //model.listTemplates()
     }
 
     private fun initObservers() {
         with(model) {
-
             templates.observe(viewLifecycleOwner, {
                 if (it.size == 1) {
-                    binding?.textViewEmpty!!.isVisible = true
-                    binding!!.templatesRecyclerView.isVisible = false
+                  /*  binding?.textViewEmpty!!.isVisible = true
+                    binding!!.templatesRecyclerView.isVisible = false*/
                 } else {
-                    binding!!.textViewEmpty.isVisible = false
+                  /*  binding!!.textViewEmpty.isVisible = false
                     binding!!.templatesRecyclerView.isVisible = true
-                    uwaziTemplatesAdapter.setEntityTemplates(it)
+                    uwaziTemplatesAdapter.setEntityTemplates(it)*/
                 }
             })
-
         }
     }
     private fun initView() {
         binding.resourcesRecyclerView?.apply {
             layoutManager = LinearLayoutManager(baseActivity)
-            adapter = uwaziTemplatesAdapter
+           // adapter = uwaziTemplatesAdapter
         }
     }
 

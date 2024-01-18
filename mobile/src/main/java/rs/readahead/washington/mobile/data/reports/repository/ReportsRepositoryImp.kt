@@ -16,11 +16,14 @@ import rs.readahead.washington.mobile.bus.SingleLiveEvent
 import rs.readahead.washington.mobile.data.database.DataSource
 import rs.readahead.washington.mobile.data.entity.reports.LoginEntity
 import rs.readahead.washington.mobile.data.entity.reports.ReportBodyEntity
+import rs.readahead.washington.mobile.data.entity.reports.ResourcesGetResponse
 import rs.readahead.washington.mobile.data.entity.reports.mapper.mapToDomainModel
 import rs.readahead.washington.mobile.data.http.HttpStatus
 import rs.readahead.washington.mobile.data.reports.remote.ReportsApiService
 import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_LOGIN
+import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_PROJECT
 import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_PROJECTS
+import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_RESOURCE
 import rs.readahead.washington.mobile.data.repository.SkippableMediaFileRequestBody
 import rs.readahead.washington.mobile.data.sharedpref.Preferences
 import rs.readahead.washington.mobile.domain.entity.EntityStatus
@@ -230,7 +233,7 @@ class ReportsRepositoryImp @Inject internal constructor(
     ): Single<ReportPostResult> {
         return apiService.submitReport(
             reportBodyEntity = reportBody,
-            url = server.url + URL_PROJECTS + "/${server.projectId}",
+            url = server.url + URL_PROJECT + "/${server.projectId}",
             access_token = server.accessToken
         ).map { it.mapToDomainModel() }
             .subscribeOn(Schedulers.io())
@@ -448,8 +451,14 @@ class ReportsRepositoryImp @Inject internal constructor(
         disposables.clear()
     }
 
-    override fun getResourcesResult(server: TellaReportServer): Single<ListResourceResult> {
-        TODO("Not yet implemented")
+    override fun getResourcesResult(server: TellaReportServer): Single<ResourcesGetResponse> {
+        return apiService.getResources(
+            url = server.url + URL_RESOURCE + URL_PROJECTS,
+            access_token = server.accessToken
+        ).map { itmapToResourcesResponse() }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnError { }
     }
 
     /**
