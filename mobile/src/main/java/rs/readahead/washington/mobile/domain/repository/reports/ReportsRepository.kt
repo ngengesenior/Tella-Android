@@ -5,9 +5,9 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import rs.readahead.washington.mobile.bus.SingleLiveEvent
+import rs.readahead.washington.mobile.data.entity.reports.ProjectSlugResourceResponse
 import rs.readahead.washington.mobile.data.entity.reports.ReportBodyEntity
 import rs.readahead.washington.mobile.domain.entity.UploadProgressInfo
-import rs.readahead.washington.mobile.domain.entity.reports.ListResourceResult
 import rs.readahead.washington.mobile.domain.entity.reports.ReportInstance
 import rs.readahead.washington.mobile.domain.entity.reports.ReportPostResult
 import rs.readahead.washington.mobile.domain.entity.reports.TellaReportServer
@@ -51,5 +51,5 @@ interface ReportsRepository {
 
     fun cleanup()
 
-    fun getResourcesResult(server: TellaReportServer): Single<ListResourceResult>
+    fun getResourcesResult(server: TellaReportServer): Single<ProjectSlugResourceResponse>
 }
