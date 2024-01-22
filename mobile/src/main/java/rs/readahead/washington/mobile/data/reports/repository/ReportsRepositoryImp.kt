@@ -453,8 +453,13 @@ class ReportsRepositoryImp @Inject internal constructor(
     }
 
     override fun getResourcesResult(server: TellaReportServer): Single<ProjectSlugResourceResponse> {
+        val url = server.url + URL_RESOURCE + URL_PROJECTS
+        val url1 = StringUtils.append(
+            '/',
+            url,
+            "?projectId[]=${server.projectId}")
         return apiService.getResources(
-            url = server.url + URL_RESOURCE + URL_PROJECTS,
+            url = url1,
             access_token = server.accessToken
         ).map { it.mapToDomainModel() }
             .subscribeOn(Schedulers.io())

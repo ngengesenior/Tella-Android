@@ -25,8 +25,10 @@ import rs.readahead.washington.mobile.domain.usecases.reports.GetReportsServersU
 import rs.readahead.washington.mobile.domain.usecases.reports.GetReportsUseCase
 import rs.readahead.washington.mobile.domain.usecases.reports.SaveReportFormInstanceUseCase
 import rs.readahead.washington.mobile.util.fromJsonToObjectList
+import rs.readahead.washington.mobile.views.adapters.uwazi.ViewLanguageItem
 import rs.readahead.washington.mobile.views.fragment.reports.adapter.ViewEntityTemplateItem
 import rs.readahead.washington.mobile.views.fragment.reports.mappers.toViewEntityInstanceItem
+import rs.readahead.washington.mobile.views.fragment.uwazi.mappers.toViewLanguageItem
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -351,9 +353,25 @@ class ReportsViewModel @Inject constructor(
             onFinished = {
             }
         )
-
     }
 
+    fun getResources(server: TellaReportServer) {
+        disposables.add(reportsRepository.getResourcesResult(server)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { _progress.postValue(true) }
+            .doFinally { _progress.postValue(false) }
+            .subscribe({
+                    Timber.d("+++ response name %s, slug %s", it.name, it.slug)
+            }
+            ) { throwable: Throwable? ->
+                Timber.d("+++ %s", throwable.toString())
+                /*FirebaseCrashlytics.getInstance().recordException(
+                    throwable
+                        ?: throw NullPointerException("Expression 'throwable' must not be null")
+                )*/
+            })
+    }
 
     fun dispose() {
         disposables.dispose()
