@@ -51,5 +51,5 @@ interface ReportsRepository {
 
     fun cleanup()
 
-    fun getResourcesResult(server: TellaReportServer): Single<ProjectSlugResourceResponse>
+    fun getResourcesResult(server: TellaReportServer): Single<List<ProjectSlugResourceResponse>>
 }

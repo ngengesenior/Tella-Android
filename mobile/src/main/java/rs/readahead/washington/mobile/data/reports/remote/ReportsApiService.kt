@@ -63,5 +63,5 @@ interface ReportsApiService {
         @Url
         url: String,
         @Header(AUTHORIZATION_HEADER) access_token: String
-    ): Single<ProjectSlugResourceResponse>
+    ): Single<ResourcesResponse>
 }

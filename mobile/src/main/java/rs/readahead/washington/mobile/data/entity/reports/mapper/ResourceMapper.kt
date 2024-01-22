@@ -1,7 +1,12 @@
 package rs.readahead.washington.mobile.data.entity.reports.mapper
 
 import rs.readahead.washington.mobile.data.entity.reports.ProjectSlugResourceResponse
+import rs.readahead.washington.mobile.data.entity.reports.ResourcesResponse
 import rs.readahead.washington.mobile.domain.entity.reports.ResourceTemplate
+
+fun ResourcesResponse.mapToDomainModel() = rows?.map {
+    it.mapToDomainModel()
+} ?: emptyList()
 
 fun ProjectSlugResourceResponse.mapToDomainModel() = ProjectSlugResourceResponse(
     id = id,

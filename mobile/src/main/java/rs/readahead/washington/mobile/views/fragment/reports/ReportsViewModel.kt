@@ -362,7 +362,7 @@ class ReportsViewModel @Inject constructor(
             .doOnSubscribe { _progress.postValue(true) }
             .doFinally { _progress.postValue(false) }
             .subscribe({
-                    Timber.d("+++ response name %s, slug %s", it.name, it.slug)
+                    Timber.d("+++ response size %s", it.toString())
             }
             ) { throwable: Throwable? ->
                 Timber.d("+++ %s", throwable.toString())
