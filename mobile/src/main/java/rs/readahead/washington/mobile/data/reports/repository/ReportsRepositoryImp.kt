@@ -455,10 +455,19 @@ class ReportsRepositoryImp @Inject internal constructor(
         val url1 = StringUtils.append(
             '/',
             url,
-            "?projectId[]=${server.projectId}")
+            "?projectId[]=${server.projectId}"
+        )
         return apiService.getResources(url1, access_token = server.accessToken)
             .subscribeOn(Schedulers.io())
-            .map { result -> result.mapToDomainModel() }
+            .map { results ->
+
+                val slugs = mutableListOf<ProjectSlugResourceResponse>()
+                results.forEach {
+                    slugs.add(it.mapToDomainModel())
+                }
+
+                return@map slugs
+            }
     }
 
     /**
