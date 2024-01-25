@@ -15,15 +15,12 @@ import rs.readahead.washington.mobile.MyApplication
 import rs.readahead.washington.mobile.bus.SingleLiveEvent
 import rs.readahead.washington.mobile.data.database.DataSource
 import rs.readahead.washington.mobile.data.entity.reports.LoginEntity
-import rs.readahead.washington.mobile.data.entity.reports.ProjectSlugResourceResponse
 import rs.readahead.washington.mobile.data.entity.reports.ReportBodyEntity
 import rs.readahead.washington.mobile.data.entity.reports.mapper.mapToDomainModel
 import rs.readahead.washington.mobile.data.http.HttpStatus
 import rs.readahead.washington.mobile.data.reports.remote.ReportsApiService
 import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_LOGIN
 import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_PROJECT
-import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_PROJECTS
-import rs.readahead.washington.mobile.data.reports.utils.ParamsNetwork.URL_RESOURCE
 import rs.readahead.washington.mobile.data.repository.SkippableMediaFileRequestBody
 import rs.readahead.washington.mobile.data.sharedpref.Preferences
 import rs.readahead.washington.mobile.domain.entity.EntityStatus
@@ -448,26 +445,6 @@ class ReportsRepositoryImp @Inject internal constructor(
 
     override fun cleanup() {
         disposables.clear()
-    }
-
-    override fun getResourcesResult(server: TellaReportServer): Single<List<ProjectSlugResourceResponse>> {
-        val url = server.url + URL_RESOURCE + URL_PROJECTS
-        val url1 = StringUtils.append(
-            '/',
-            url,
-            "?projectId[]=${server.projectId}"
-        )
-        return apiService.getResources(url1, access_token = server.accessToken)
-            .subscribeOn(Schedulers.io())
-            .map { results ->
-
-                val slugs = mutableListOf<ProjectSlugResourceResponse>()
-                results.forEach {
-                    slugs.add(it.mapToDomainModel())
-                }
-
-                return@map slugs
-            }
     }
 
     /**

@@ -355,24 +355,6 @@ class ReportsViewModel @Inject constructor(
         )
     }
 
-    fun getResources(server: TellaReportServer) {
-        disposables.add(reportsRepository.getResourcesResult(server)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { _progress.postValue(true) }
-            .doFinally { _progress.postValue(false) }
-            .subscribe({
-                    Timber.d("+++ response size %s", it.toString())
-            }
-            ) { throwable: Throwable? ->
-                Timber.d("+++ %s", throwable.toString())
-                /*FirebaseCrashlytics.getInstance().recordException(
-                    throwable
-                        ?: throw NullPointerException("Expression 'throwable' must not be null")
-                )*/
-            })
-    }
-
     fun dispose() {
         disposables.dispose()
     }

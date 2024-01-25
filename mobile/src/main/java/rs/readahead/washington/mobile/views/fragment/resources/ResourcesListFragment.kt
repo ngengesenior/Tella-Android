@@ -14,7 +14,7 @@ import rs.readahead.washington.mobile.views.fragment.reports.ReportsViewModel
 class ResourcesListFragment :
     BaseBindingFragment<FragmentResourcesListBinding>(FragmentResourcesListBinding::inflate) {
 
-    private val model: ReportsViewModel by viewModels()
+    private val model: ResourcesViewModel by viewModels()
     private lateinit var selectedServer: TellaReportServer
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
