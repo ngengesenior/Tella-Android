@@ -7,7 +7,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import rs.readahead.washington.mobile.MyApplication
 import rs.readahead.washington.mobile.data.database.DataSource
+import rs.readahead.washington.mobile.data.database.KeyDataSource
 import rs.readahead.washington.mobile.domain.entity.reports.TellaReportServer
 import rs.readahead.washington.mobile.domain.repository.resources.ResourcesRepository
 import rs.readahead.washington.mobile.domain.usecases.reports.GetReportsServersUseCase
@@ -22,7 +24,7 @@ class ResourcesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-
+    private val keyDataSource: KeyDataSource = MyApplication.getKeyDataSource()
     private val _progress = MutableLiveData<Boolean>()
 
     private val _resources = MutableLiveData<List<Any>>()
@@ -44,16 +46,21 @@ class ResourcesViewModel @Inject constructor(
         })
     }
 
-    fun getResources(server: TellaReportServer) {
-        disposables.add(resourcesRepository.getResourcesResult(server)
+    fun getResources() {
+        disposables.add(keyDataSource.dataSource
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _progress.postValue(true) }
-            .doFinally { _progress.postValue(false) }
-            .subscribe({
-                    Timber.d("+++ response size %s", it.toString())
+            .flatMap { dataSource: DataSource ->
+                dataSource.listTellaUploadServers().toObservable()
             }
-            ) { throwable: Throwable? ->
+            .flatMap { servers: List<TellaReportServer> ->
+                resourcesRepository.getResourcesResult(servers[0]).toObservable()
+            }
+            .subscribe({
+                Timber.d("+++ response size %s", it.toString())
+            })
+            { throwable: Throwable? ->
                 Timber.d("+++ %s", throwable.toString())
                 /*FirebaseCrashlytics.getInstance().recordException(
                     throwable

@@ -8,7 +8,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import rs.readahead.washington.mobile.databinding.FragmentResourcesListBinding
 import rs.readahead.washington.mobile.domain.entity.reports.TellaReportServer
 import rs.readahead.washington.mobile.views.base_ui.BaseBindingFragment
-import rs.readahead.washington.mobile.views.fragment.reports.ReportsViewModel
 
 @AndroidEntryPoint
 class ResourcesListFragment :
@@ -28,19 +27,13 @@ class ResourcesListFragment :
 
     override fun onResume() {
         super.onResume()
-        model.listServers()
+        model.getResources()
         //model.getResources()
     }
 
     private fun initObservers() {
         with(model) {
             serversList.observe(viewLifecycleOwner, {
-                if (it.size > 0) {
-                    selectedServer = it.get(0)
-                    model.getResources(selectedServer)
-                } else {
-
-                }
             })
         }
     }
