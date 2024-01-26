@@ -7,7 +7,7 @@ import rs.readahead.washington.mobile.domain.entity.reports.TellaReportServer
 
 interface ResourcesRepository {
 
-    fun getResourcesResult(server: TellaReportServer): Single<List<ProjectSlugResourceResponse>>
+    fun getResourcesResult(server: List<TellaReportServer>): Single<List<ProjectSlugResourceResponse>>
 
     fun getDisposable(): CompositeDisposable
 

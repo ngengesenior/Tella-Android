@@ -55,7 +55,7 @@ class ResourcesViewModel @Inject constructor(
                 dataSource.listTellaUploadServers().toObservable()
             }
             .flatMap { servers: List<TellaReportServer> ->
-                resourcesRepository.getResourcesResult(servers[0]).toObservable()
+                resourcesRepository.getResourcesResult(servers).toObservable()
             }
             .subscribe({
                 Timber.d("+++ response size %s", it.toString())
