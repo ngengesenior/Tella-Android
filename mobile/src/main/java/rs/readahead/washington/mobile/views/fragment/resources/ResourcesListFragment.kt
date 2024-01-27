@@ -28,7 +28,6 @@ class ResourcesListFragment :
     override fun onResume() {
         super.onResume()
         model.getResources()
-        //model.getResources()
     }
 
     private fun initObservers() {

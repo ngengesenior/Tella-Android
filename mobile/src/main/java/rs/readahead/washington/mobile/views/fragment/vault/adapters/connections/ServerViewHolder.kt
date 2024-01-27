@@ -32,19 +32,11 @@ class ServerViewHolder(val view: View) : BaseViewHolder<ServerDataItem>(view) {
                 )
             }
             ServerType.TELLA_UPLOAD -> {
-                /*reportTypeTextView.text = view.context.getText(R.string.Home_BottomNav_Reports)
+                reportTypeTextView.text = view.context.getText(R.string.Home_BottomNav_Reports)
                 reportTypeImg.setImageDrawable(
                     ResourcesCompat.getDrawable(
                         view.resources,
                         R.drawable.baseline_assignment_24,
-                        null
-                    )
-                )*/
-                reportTypeTextView.text = view.context.getText(R.string.Home_BottomNav_Resources)
-                reportTypeImg.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        view.resources,
-                        R.drawable.resource_info,
                         null
                     )
                 )

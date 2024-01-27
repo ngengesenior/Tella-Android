@@ -19,8 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ResourcesViewModel @Inject constructor(
     private val getReportsServersUseCase: GetReportsServersUseCase,
-    private val resourcesRepository: ResourcesRepository,
-    private val dataSource: DataSource
+    private val resourcesRepository: ResourcesRepository
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
