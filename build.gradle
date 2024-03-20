@@ -71,6 +71,7 @@ buildscript {
     versions.permissionDispatcher = "4.8.0"
     versions.googlePlayServices = "17.0.0"
     versions.pdf_viewer = "2.8.2"
+    versions.lib_proofmode = "1.0.29"
 
     repositories {
         mavenCentral()
@@ -104,6 +105,9 @@ allprojects {
         }
         maven { url 'https://jitpack.io' }
         google()  // Google's Maven repository
+        // ProofMode maven repository
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+
     }
 }
 

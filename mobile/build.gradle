@@ -163,6 +163,14 @@ dependencies {
     testImplementation "junit:junit:$versions.junit"
 
     implementation("com.vanniktech:android-image-cropper:4.3.3")
+
+    // ProofMode
+    implementation "org.proofmode:android-libproofmode:$versions.lib_proofmode"
+
+    implementation 'org.bouncycastle:bcpkix-jdk15to18:1.72'
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.72'
+    implementation 'org.bouncycastle:bcpg-jdk15to18:1.71'
+
 }
 
 kapt {

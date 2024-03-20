@@ -27,6 +27,7 @@ import com.hzontal.tella_vault.VaultFile;
 import com.hzontal.tella_vault.filter.FilterType;
 
 import org.hzontal.shared_ui.utils.DialogUtils;
+import org.witness.proofmode.service.MediaWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +81,7 @@ public class MainActivity extends MetadataActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
 
         //  setupToolbar();
         setupNavigation();
