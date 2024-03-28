@@ -31,6 +31,7 @@ import com.hzontal.tella_locking_ui.ui.pin.PinUnlockActivity;
 import com.hzontal.tella_vault.Vault;
 import com.hzontal.tella_vault.rx.RxVault;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.cleaninsights.sdk.CleanInsights;
 import org.hzontal.tella.keys.MainKeyStore;
 import org.hzontal.tella.keys.TellaKeys;
@@ -43,8 +44,10 @@ import org.hzontal.tella.keys.key.MainKey;
 import org.hzontal.tella.keys.wrapper.AndroidKeyStoreWrapper;
 import org.hzontal.tella.keys.wrapper.PBEKeyWrapper;
 import org.hzontal.tella.keys.wrapper.UnencryptedKeyWrapper;
+import org.witness.proofmode.ProofMode;
 
 import java.io.File;
+import java.security.Security;
 
 import javax.inject.Inject;
 
@@ -166,6 +169,11 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         //ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
         BaseApi.Builder apiBuilder = new BaseApi.Builder();
 
+        // Add BC provider if it is not added
+
+        // Set proof points
+        ProofMode.setProofPoints(this,true,true,true,true);
+        ProofMode.checkAndGeneratePublicKeyAsync(this,"default_password");
         if (BuildConfig.DEBUG) {
             //  StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
             ///        .detectAll().penaltyLog()/*.penaltyDeath()*/.build()); // todo: catch those..
@@ -208,6 +216,9 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         JavaRosa.initializeJavaRosa(mgr);
         vaultConfig = new Vault.Config();
         vaultConfig.root = new File(this.getFilesDir(), C.MEDIA_DIR);
+
+        // Set proof folder
+        ProofMode.setProofFileSystem(vaultConfig.root);
         //Tella keys
         TellaKeys.initialize();
         initializeLockConfigRegistry();
@@ -359,5 +370,12 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
     @Override
     public Configuration getWorkManagerConfiguration() {
         return new Configuration.Builder().setMinimumLoggingLevel(android.util.Log.DEBUG).setWorkerFactory(workerFactory).build();
+    }
+
+    // This is added in the ProofMode library but seems not to be working
+    static {
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
     }
 }
