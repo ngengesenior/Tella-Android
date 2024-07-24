@@ -54,6 +54,7 @@ public class AudioRecorder {
     }
 
     public Observable<VaultFile> startRecording(String filename, @Nullable String parent) {
+        //TODO: Init proof root vault file here
         return Observable.fromCallable(() -> {
             VaultFile vaultFile;
             RxVaultFileBuilder rxVaultFileBuilder = MyApplication.rxVault.builder()

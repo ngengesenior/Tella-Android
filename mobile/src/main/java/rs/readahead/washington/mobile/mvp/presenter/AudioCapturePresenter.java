@@ -53,6 +53,7 @@ public class AudioCapturePresenter implements IAudioCapturePresenterContract.IPr
     public void startRecording(String filename, String parent) {
         audioRecorder = new AudioRecorder(this);
         disposables.add(audioRecorder.startRecording(filename, parent)
+                //TODO: 1 Generate proof on recording stop
                 .subscribe(vaultFile -> view.onRecordingStopped(vaultFile), throwable -> view.onRecordingError())
         );
     }

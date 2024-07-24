@@ -72,6 +72,8 @@ buildscript {
     versions.googlePlayServices = "17.0.0"
     versions.pdf_viewer = "2.8.2"
     versions.lib_proofmode = "1.0.29"
+    versions.google_safetynet = "18.0.1"
+    versions.opentimestamps = "1.0.27"
 
     repositories {
         mavenCentral()

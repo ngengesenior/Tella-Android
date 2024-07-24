@@ -268,10 +268,7 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
      */
 
     private fun generateProof(file:VaultFile) {
-        val storageProvider = TellaProofModeStorageProvider(applicationContext)
-        MediaWatcher.getInstance(applicationContext).setStorageProvider(storageProvider)
         val mediaFile = MyApplication.rxVault.getFile(file)
-        val stream = MyApplication.vault.getStream(file)
         val uri = EncryptedFileProvider.getUriForFile(applicationContext,EncryptedFileProvider.AUTHORITY,mediaFile)
         Timber.d("The file Uri is ${uri.scheme}")
         ProofMode.generateProof(applicationContext,uri,file.hash)
@@ -584,10 +581,13 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(result: PictureResult) {
                 viewModel.addJpegPhoto(result.data, currentRootParent)
+                //TODO Generate proof
             }
 
             override fun onVideoTaken(result: VideoResult) {
                 showConfirmVideoView(result.file)
+                //TODO: Generate proof
+
             }
 
             override fun onCameraError(exception: CameraException) {

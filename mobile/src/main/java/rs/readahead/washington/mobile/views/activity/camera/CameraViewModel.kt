@@ -14,6 +14,7 @@ import rs.readahead.washington.mobile.media.MediaFileHandler
 import java.io.File
 import javax.inject.Inject
 
+//TODO Look atb this VM
 @HiltViewModel
 class CameraViewModel @Inject constructor() : ViewModel() {
     private val disposables = CompositeDisposable()

@@ -3,53 +3,67 @@ package rs.readahead.washington.mobile.proofmode_storage
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toFile
+import com.hzontal.tella_vault.VaultFile
+import org.apache.commons.io.IOUtils
 import org.witness.proofmode.ProofMode
 import org.witness.proofmode.storage.StorageListener
 import org.witness.proofmode.storage.StorageProvider
 import rs.readahead.washington.mobile.MyApplication
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.PrintStream
-import java.util.ArrayList
+import java.nio.charset.Charset
 
 class TellaProofModeStorageProvider(private val context: Context):StorageProvider {
     private val BASE_PROOF_FOLDER = "proofmode/"
     override fun saveStream(hash: String?, identifier: String?, inputStream: InputStream?, storageListener: StorageListener?) {
+        // The hash is the parent and the identifier is the file id
+        MyApplication.vault.builder(inputStream)
+            .setId(identifier)
+            // We need to set mime type
+            .build(hash)
+
 
     }
 
     override fun saveBytes(hash: String?, identifier: String?, byteArray: ByteArray?, storageListener: StorageListener?) {
+        val bis = ByteArrayInputStream(byteArray)
+        saveStream(hash,identifier,bis,storageListener)
 
     }
 
     override fun saveText(hash: String?, identifier: String?, data: String?, storageListener: StorageListener?) {
-        val file = File(getHashStorageDir(hash!!),identifier!!)
-        data?.let {
-            writeTextToFile(file,data)
-        }
+        val inputStream = IOUtils.toInputStream(data, Charset.defaultCharset())
+        saveStream(hash,identifier,inputStream,storageListener)
     }
 
     @Throws(FileNotFoundException::class,SecurityException::class)
-    override fun getInputStream(hash: String?, identifier: String?): InputStream = FileInputStream(File(getHashStorageDir(hash!!),identifier!!))
+    override fun getInputStream(hash: String?, identifier: String?): InputStream? {
+        return MyApplication.rxVault.getStream(identifier)
+    }
 
 
-    override fun getOutputStream(hash: String?, identifier: String?): OutputStream = FileOutputStream(File(getHashStorageDir(hash!!),identifier!!))
+    override fun getOutputStream(hash: String?, identifier: String?): OutputStream {
+       return MyApplication.rxVault.getOutStream(identifier)
+    }
 
     override fun proofExists(hash: String?): Boolean {
         return proofIdentifierExists(hash, hash+ProofMode.PROOF_FILE_TAG)
     }
 
+    @Throws(Exception::class)
     override fun proofIdentifierExists(hash: String?, identifier: String?): Boolean {
-        val dirProof = hash?.let { getHashStorageDir(it)}
-        if (dirProof?.exists() == true) {
-            return (identifier?.let { File(dirProof,it).exists()} == true)
-        }
-        return false
+        val rootVault:VaultFile = getParentVaultFile(hash) ?: return false
+        return MyApplication.rxVault.list(rootVault).blockingGet()
+            .any { it.id == identifier }
+    }
+
+    fun getProofVaultFiles(hash: String?): List<VaultFile> {
+        val rootVault: VaultFile = getParentVaultFile(hash) ?: return emptyList()
+        return MyApplication.rxVault?.list(rootVault)?.blockingGet() ?: emptyList()
     }
 
     override fun getProofSet(hash: String?): ArrayList<Uri> {
@@ -69,6 +83,9 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
         } else null
     }
 
+    private fun getParentVaultFile(hash: String?):VaultFile? {
+        return MyApplication.rxVault?.get(hash)?.blockingGet()
+    }
     private fun getHashStorageDir(hash:String):File? {
 
         var proofFileSystem:File? = ProofMode.getProofFileSystem()
@@ -86,30 +103,4 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
         return fileHashDir
     }
 
-    private fun writeTextToFile(fileOut:File,text:String) {
-        try {
-            val ps = PrintStream(FileOutputStream(fileOut,true))
-            ps.apply {
-                println(text)
-                flush()
-                close()
-            }
-
-        }catch (ioe: IOException) {
-            ioe.printStackTrace()
-        }
-    }
-    @Throws(FileNotFoundException::class,SecurityException::class)
-    private fun writeBytesToFile(fileOut:File,data:ByteArray) {
-        FileOutputStream(fileOut).write(data)
-    }
-
-    @Throws(FileNotFoundException::class,SecurityException::class)
-    fun copyStreamToFile(inputStream: InputStream,fileOut:File) {
-       // ProofMode.checkAndGeneratePublicKeyAsync()
-        val outputStream = FileOutputStream(fileOut)
-        inputStream.copyTo(outputStream)
-        inputStream.close()
-        outputStream.close()
-    }
 }

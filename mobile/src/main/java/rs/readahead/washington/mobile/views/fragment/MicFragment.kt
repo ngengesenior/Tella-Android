@@ -360,6 +360,7 @@ class MicFragment : MetadataBaseLockFragment(),
     }
 
     override fun onRecordingStopped(vaultFile: VaultFile?) {
+        //TODO 2: Or generate proof here
         if (vaultFile == null) {
             handlingMediaFile = null
             disablePause()

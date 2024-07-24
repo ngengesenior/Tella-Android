@@ -45,6 +45,8 @@ import org.hzontal.tella.keys.wrapper.AndroidKeyStoreWrapper;
 import org.hzontal.tella.keys.wrapper.PBEKeyWrapper;
 import org.hzontal.tella.keys.wrapper.UnencryptedKeyWrapper;
 import org.witness.proofmode.ProofMode;
+import org.witness.proofmode.notaries.OpenTimestampsNotarizationProvider;
+import org.witness.proofmode.service.MediaWatcher;
 
 import java.io.File;
 import java.security.Security;
@@ -62,6 +64,9 @@ import rs.readahead.washington.mobile.data.sharedpref.SharedPrefs;
 import rs.readahead.washington.mobile.javarosa.JavaRosa;
 import rs.readahead.washington.mobile.javarosa.PropertyManager;
 import rs.readahead.washington.mobile.media.MediaFileHandler;
+import rs.readahead.washington.mobile.notaries.GoogleSafetyNetNotarizationProvider;
+import rs.readahead.washington.mobile.notaries.SafetyNetCheck;
+import rs.readahead.washington.mobile.proofmode_storage.TellaProofModeStorageProvider;
 import rs.readahead.washington.mobile.util.C;
 import rs.readahead.washington.mobile.util.CleanInsightUtils;
 import rs.readahead.washington.mobile.util.LocaleManager;
@@ -159,7 +164,23 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         super.attachBaseContext(LocaleManager.getInstance().getLocalizedContext(newBase));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void addNotarizationProviders() {
+        SafetyNetCheck.setApiKey("");
+        try {
+            ProofMode.addNotarizationProvider(this,new GoogleSafetyNetNotarizationProvider(this));
+        } catch (Exception e){
+           Timber.e(e);
+        }
+
+        try {
+            ProofMode.addNotarizationProvider(this,new OpenTimestampsNotarizationProvider());
+        }catch (Exception e) {
+
+            Timber.e(e);
+        }
+
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -174,6 +195,10 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         // Set proof points
         ProofMode.setProofPoints(this,true,true,true,true);
         ProofMode.checkAndGeneratePublicKeyAsync(this,"default_password");
+        addNotarizationProviders();
+
+        // Tella storage provider
+        MediaWatcher.getInstance(this).setStorageProvider(new TellaProofModeStorageProvider(this));
         if (BuildConfig.DEBUG) {
             //  StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
             ///        .detectAll().penaltyLog()/*.penaltyDeath()*/.build()); // todo: catch those..
@@ -214,11 +239,6 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         // Collect
         PropertyManager mgr = new PropertyManager();
         JavaRosa.initializeJavaRosa(mgr);
-        vaultConfig = new Vault.Config();
-        vaultConfig.root = new File(this.getFilesDir(), C.MEDIA_DIR);
-
-        // Set proof folder
-        ProofMode.setProofFileSystem(vaultConfig.root);
         //Tella keys
         TellaKeys.initialize();
         initializeLockConfigRegistry();
