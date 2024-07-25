@@ -48,7 +48,6 @@ import org.witness.proofmode.ProofMode;
 import org.witness.proofmode.notaries.OpenTimestampsNotarizationProvider;
 import org.witness.proofmode.service.MediaWatcher;
 
-import java.io.File;
 import java.security.Security;
 
 import javax.inject.Inject;
@@ -64,10 +63,7 @@ import rs.readahead.washington.mobile.data.sharedpref.SharedPrefs;
 import rs.readahead.washington.mobile.javarosa.JavaRosa;
 import rs.readahead.washington.mobile.javarosa.PropertyManager;
 import rs.readahead.washington.mobile.media.MediaFileHandler;
-import rs.readahead.washington.mobile.notaries.GoogleSafetyNetNotarizationProvider;
-import rs.readahead.washington.mobile.notaries.SafetyNetCheck;
-import rs.readahead.washington.mobile.proofmode_storage.TellaProofModeStorageProvider;
-import rs.readahead.washington.mobile.util.C;
+import rs.readahead.washington.mobile.proofmode.storage.TellaProofModeStorageProvider;
 import rs.readahead.washington.mobile.util.CleanInsightUtils;
 import rs.readahead.washington.mobile.util.LocaleManager;
 import rs.readahead.washington.mobile.util.TellaUpgrader;
@@ -165,12 +161,6 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
     }
 
     private void addNotarizationProviders() {
-        SafetyNetCheck.setApiKey("");
-        try {
-            ProofMode.addNotarizationProvider(this,new GoogleSafetyNetNotarizationProvider(this));
-        } catch (Exception e){
-           Timber.e(e);
-        }
 
         try {
             ProofMode.addNotarizationProvider(this,new OpenTimestampsNotarizationProvider());

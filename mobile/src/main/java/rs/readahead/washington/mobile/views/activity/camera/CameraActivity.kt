@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.hardware.SensorManager
 import android.media.AudioManager
 import android.os.Bundle
-import android.util.Log
 import android.view.OrientationEventListener
 import android.view.View
 import android.widget.ImageView
@@ -18,7 +17,6 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -42,8 +40,6 @@ import com.otaliastudios.cameraview.size.SizeSelector
 import dagger.hilt.android.AndroidEntryPoint
 import org.hzontal.shared_ui.utils.DialogUtils
 import org.witness.proofmode.ProofMode
-import org.witness.proofmode.service.MediaWatcher
-import rs.readahead.washington.mobile.BuildConfig
 import rs.readahead.washington.mobile.MyApplication
 import rs.readahead.washington.mobile.R
 import rs.readahead.washington.mobile.bus.event.CaptureEvent
@@ -54,7 +50,6 @@ import rs.readahead.washington.mobile.media.MediaFileHandler
 import rs.readahead.washington.mobile.mvp.contract.IMetadataAttachPresenterContract
 import rs.readahead.washington.mobile.mvp.presenter.MetadataAttacher
 import rs.readahead.washington.mobile.mvvm.viewmodel.TellaFileUploadSchedulerViewModel
-import rs.readahead.washington.mobile.proofmode_storage.TellaProofModeStorageProvider
 import rs.readahead.washington.mobile.util.C
 import rs.readahead.washington.mobile.util.DialogsUtil
 import rs.readahead.washington.mobile.util.VideoResolutionManager

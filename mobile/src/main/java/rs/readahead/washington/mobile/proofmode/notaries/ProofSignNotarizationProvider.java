@@ -1,4 +1,4 @@
-package rs.readahead.washington.mobile.notaries;
+package rs.readahead.washington.mobile.proofmode.notaries;
 
 import org.witness.proofmode.notarization.NotarizationListener;
 import org.witness.proofmode.notarization.NotarizationProvider;
