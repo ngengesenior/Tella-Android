@@ -19,7 +19,9 @@ import java.nio.charset.Charset
 class TellaProofModeStorageProvider(private val context: Context):StorageProvider {
     override fun saveStream(hash: String?, identifier: String?, inputStream: InputStream?, storageListener: StorageListener?) {
         // The hash is the parent and the identifier is the file id
-        MyApplication.vault.builder(inputStream)
+        MyApplication
+            .vault
+            .builder(inputStream)
             .setId(identifier)
             // We need to set mime type
             .build(hash)
