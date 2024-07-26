@@ -3,6 +3,7 @@ package rs.readahead.washington.mobile.util
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -13,12 +14,14 @@ import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
-import org.cleaninsights.sdk.Campaign
+/*import org. cleaninsights.sdk.Campaign
 import org.cleaninsights.sdk.CleanInsights
-import org.cleaninsights.sdk.CleanInsightsConfiguration
+import org.cleaninsights.sdk.CleanInsightsConfiguration*/
 import timber.log.Timber
 import java.net.URL
 
@@ -76,7 +79,7 @@ fun Window.changeStatusColor(context: Context, color: Int) {
         statusBarColor = context.resources.getColor(color)
     }
 }
-
+/*
 fun createCleanInsightsInstance(context: Context, startDate: Long): CleanInsights? {
     return try {
         val endDate = startDate + (7 * 86400)
@@ -91,7 +94,7 @@ fun createCleanInsightsInstance(context: Context, startDate: Long): CleanInsight
         e.printStackTrace()
         null
     }
-}
+}*/
 
 
 fun View.setTint(@ColorRes colorRes: Int) {
@@ -151,5 +154,9 @@ fun Context.isScreenReaderOn(): Boolean {
             return true
     }
     return false
+}
+
+fun NavController.navigateSafe(destinationId: Int, bundle: Bundle? = null) {
+    navigate(destinationId, bundle)
 }
 

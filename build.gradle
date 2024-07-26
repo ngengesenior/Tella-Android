@@ -9,7 +9,8 @@ buildscript {
     versions.minSdk = 24
     versions.targetSdk = 34
     versions.kotlin = '1.9.20'
-    versions.sqlcipher = '3.5.9'
+    versions.sqlcipher = '4.6.0'
+    versions.sqlite = '2.4.0'
     versions.biometric = '1.0.1'
     versions.junit = '4.13'
     versions.testJunit = '1.1.2'
@@ -40,11 +41,11 @@ buildscript {
     versions.navigationFragment = '2.5.1'
     versions.databindingRuntime = '7.4.2'
     versions.firebaseBom = '26.1.0'
-    versions.okhttp3LoggingInterceptor = '3.6.0'
+    versions.okhttp3LoggingInterceptor = '4.12.0'
     versions.squareupTape = '1.2.3'
     versions.cacheword = '0.1.1'
     versions.glide = '4.15.0'
-    versions.burgstallerOkhttpDigest = '1.15'
+    versions.burgstallerOkhttpDigest = '3.1.0'
     versions.javarosa = '2.6.0'
     versions.kxml2 = '2.3.0'
     versions.commonsIo = '2.6'
@@ -66,14 +67,14 @@ buildscript {
     versions.hilt_version = "1.1.0"
     versions.hilt_android = "2.50"
     versions.hilt_viewmodel = '1.0.0-alpha03'
-    versions.leakCanaryVersion = "2.7"
+    versions.leakCanaryVersion = "3.0-alpha-1"
     versions.hilt_android_compiler = "2.50"
     versions.permissionDispatcher = "4.8.0"
     versions.googlePlayServices = "17.0.0"
     versions.pdf_viewer = "2.8.2"
     versions.lib_proofmode = "1.0.29"
-    versions.google_safetynet = "18.0.1"
     versions.opentimestamps = "1.0.27"
+    versions.divviup = "0.2.0"
 
     repositories {
         mavenCentral()

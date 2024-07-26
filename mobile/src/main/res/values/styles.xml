@@ -81,6 +81,11 @@
         <item name="android:fontFamily">@font/open_sans</item>
     </style>
 
+    <style name="FullScreenDialogStyle" parent="AppTheme">
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
     <style name="PlayerTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -510,6 +515,16 @@
         <item name="android:textSize">14sp</item>
         <item name="fontFamily">@font/open_sans</item>
     </style>
+
+
+    <style name="TopSheet_DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_out_from_top</item>
+        <item name="android:windowExitAnimation">@anim/slide_back_to_top</item>
+    </style>
+
+
+
+
 
     <style name="Submit_Text_Button">
         <item name="android:layout_width">wrap_content</item>

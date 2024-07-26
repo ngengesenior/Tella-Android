@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "org.cleaninsights.sdk.test.clean-insights-mergeDebugAndroidTestResources-14:/values-v25/values-v25.xml",
+            "map": [
+                {
+                    "source": "/Users/ngengesenior/.gradle/caches/transforms-3/43c9753fa8b0ad7a57b0b6b051221fad/transformed/appcompat-1.4.1/res/values-v25/values-v25.xml",
+                    "from": {
+                        "startLines": "2,3,4,6",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,126,209,308",
+                        "endLines": "2,3,5,7",
+                        "endColumns": "70,82,12,12",
+                        "endOffsets": "121,204,303,414"
+                    }
+                }
+            ]
+        }
+    ]
+}

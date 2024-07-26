@@ -1,0 +1,38 @@
+{
+    "logs": [
+        {
+            "outputFile": "org.cleaninsights.sdk.test.clean-insights-mergeDebugAndroidTestResources-14:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "/Users/ngengesenior/.gradle/caches/transforms-3/43c9753fa8b0ad7a57b0b6b051221fad/transformed/appcompat-1.4.1/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "121",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "289"
+                    }
+                },
+                {
+                    "source": "/Users/ngengesenior/.gradle/caches/transforms-3/da256810a335a84c3644bc1a419e09a9/transformed/core-1.7.0/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}

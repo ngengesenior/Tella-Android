@@ -7,7 +7,11 @@ import com.google.android.material.tabs.TabLayoutMediator
 import rs.readahead.washington.mobile.R
 import rs.readahead.washington.mobile.databinding.FragmentUwaziBinding
 import rs.readahead.washington.mobile.views.base_ui.BaseBindingFragment
-import rs.readahead.washington.mobile.views.fragment.uwazi.viewpager.*
+import rs.readahead.washington.mobile.views.fragment.uwazi.viewpager.DRAFT_LIST_PAGE_INDEX
+import rs.readahead.washington.mobile.views.fragment.uwazi.viewpager.OUTBOX_LIST_PAGE_INDEX
+import rs.readahead.washington.mobile.views.fragment.uwazi.viewpager.SUBMITTED_LIST_PAGE_INDEX
+import rs.readahead.washington.mobile.views.fragment.uwazi.viewpager.TEMPLATES_LIST_PAGE_INDEX
+import rs.readahead.washington.mobile.views.fragment.uwazi.viewpager.ViewPagerAdapter
 
 class UwaziFragment : BaseBindingFragment<FragmentUwaziBinding>(FragmentUwaziBinding::inflate) {
 
@@ -35,18 +39,18 @@ class UwaziFragment : BaseBindingFragment<FragmentUwaziBinding>(FragmentUwaziBin
             )
 
             fabButton.setOnClickListener {
-                nav().navigate(R.id.action_uwaziScreen_to_uwaziDownloadScreen)
+                navManager().navigateFromUwaziScreenToDownloadScreen()
             }
         }
 
-        SharedLiveData.updateViewPagerPosition.observe(baseActivity, { position ->
+        SharedLiveData.updateViewPagerPosition.observe(baseActivity) { position ->
             when (position) {
                 TEMPLATES_LIST_PAGE_INDEX -> setCurrentTab(TEMPLATES_LIST_PAGE_INDEX)
                 DRAFT_LIST_PAGE_INDEX -> setCurrentTab(DRAFT_LIST_PAGE_INDEX)
                 OUTBOX_LIST_PAGE_INDEX -> setCurrentTab(OUTBOX_LIST_PAGE_INDEX)
                 SUBMITTED_LIST_PAGE_INDEX -> setCurrentTab(SUBMITTED_LIST_PAGE_INDEX)
             }
-        })
+        }
 
         binding.toolbar.backClickListener = { nav().popBackStack() }
     }

@@ -38,8 +38,10 @@ import com.otaliastudios.cameraview.gesture.Gesture
 import com.otaliastudios.cameraview.gesture.GestureAction
 import com.otaliastudios.cameraview.size.SizeSelector
 import dagger.hilt.android.AndroidEntryPoint
+import org.hzontal.shared_ui.bottomsheet.BottomSheetUtils
 import org.hzontal.shared_ui.utils.DialogUtils
 import org.witness.proofmode.ProofMode
+import org.witness.proofmode.service.MediaWatcher
 import rs.readahead.washington.mobile.MyApplication
 import rs.readahead.washington.mobile.R
 import rs.readahead.washington.mobile.bus.event.CaptureEvent
@@ -66,6 +68,7 @@ import rs.readahead.washington.mobile.views.custom.CameraSwitchButton
 import rs.readahead.washington.mobile.views.fragment.uwazi.attachments.VAULT_FILE_KEY
 import timber.log.Timber
 import java.io.File
+import java.util.Date
 
 @AndroidEntryPoint
 class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IView {
@@ -98,8 +101,9 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     private var currentRootParent: String? = null
     private lateinit var binding: ActivityCameraBinding
     private var captureWithAutoUpload = true
-    private val viewModel by viewModels<CameraViewModel>()
+    private val viewModel by viewModels<SharedCameraViewModel>()
     private val uploadViewModel by viewModels<TellaFileUploadSchedulerViewModel>()
+    private var isAddingInProgress = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,7 +153,10 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         }
 
         viewModel.addingInProgress.observe(this) { isAdding ->
-            if (isAdding) onAddingStart() else onAddingEnd()
+            isAddingInProgress = isAdding
+            if (isAdding) {
+                onAddingStart()
+            }
         }
 
         viewModel.lastMediaFileSuccess.observe(this) { mediaFile ->
@@ -169,7 +176,7 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         }
 
         uploadViewModel.mediaFilesUploadScheduleError.observe(this) {
-            onMediaFilesUploadScheduleError(it)
+            onMediaFilesUploadScheduleError()
         }
     }
 
@@ -200,10 +207,6 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         cameraView.close()
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         hideProgressDialog()
@@ -214,6 +217,24 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (maybeStopVideoRecording()) return
+        if (!Preferences.isAnonymousMode() && isAddingInProgress) {
+            BottomSheetUtils.showConfirmSheet(fragmentManager = supportFragmentManager,
+                getString(R.string.exit_and_discard_verification_info),
+                getString(R.string.recording_in_progress_exit_warning),
+                getString(R.string.exit_and_discard_info),
+                getString(R.string.back),
+                consumer = object : BottomSheetUtils.ActionConfirmed {
+                    override fun accept(isConfirmed: Boolean) {
+                        if (isConfirmed) {
+                            finish()
+                        } else {
+                            return
+                        }
+                    }
+                })
+            return
+        }
+
         super.onBackPressed()
         finish()
     }
@@ -224,20 +245,10 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     }
 
     private fun onAddingStart() {
-        progressDialog = DialogsUtil.showLightProgressDialog(
-            this, getString(R.string.gallery_dialog_expl_encrypting)
-        )
         if (Preferences.isShutterMute()) {
             val mgr = getSystemService(AUDIO_SERVICE) as AudioManager
             mgr.setStreamMute(AudioManager.STREAM_SYSTEM, false)
         }
-    }
-
-    private fun onAddingEnd() {
-        hideProgressDialog()
-        DialogUtils.showBottomMessage(
-            this, getString(R.string.gallery_toast_file_encrypted), false
-        )
     }
 
     private fun onAddSuccess(file: VaultFile) {
@@ -265,20 +276,12 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     private fun generateProof(file:VaultFile) {
         val mediaFile = MyApplication.rxVault.getFile(file)
         val uri = EncryptedFileProvider.getUriForFile(applicationContext,EncryptedFileProvider.AUTHORITY,mediaFile)
-        Timber.d("The file Uri is ${uri.scheme}")
-        ProofMode.generateProof(applicationContext,uri,file.hash)
-
-
-
-        //val resolver = applicationContext.contentResolver
-        Timber.d("File:"+ mediaFile.absolutePath)
-
+        MediaWatcher.getInstance(applicationContext).processUri(uri,file.hash,true, Date())
+        //ProofMode.generateProof(applicationContext,uri,file.hash)
     }
 
     private fun onAddError(error: Throwable) {
-        DialogUtils.showBottomMessage(
-            this, getString(R.string.gallery_toast_fail_saving_file), true
-        )
+        DialogUtils.showBottomMessage(this, getString(R.string.gallery_toast_fail_saving_file), true)
     }
 
     override fun onMetadataAttached(vaultFile: VaultFile) {
@@ -385,7 +388,7 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         DialogUtils.showBottomMessage(this, message, false)
     }
 
-    private fun onMediaFilesUploadScheduleError(throwable: Throwable) {
+    private fun onMediaFilesUploadScheduleError() {
 
     }
 
@@ -608,7 +611,7 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
                     flashButton.visibility = View.VISIBLE
                     setupCameraFlashButton(options.supportedFlash)
                 }
-                if (options.supportedVideoSizes.size > 0) {
+                if (options.supportedVideoSizes.isNotEmpty()) {
                     videoResolutionManager = VideoResolutionManager(options.supportedVideoSizes)
                 }
                 // options object has info
@@ -670,16 +673,22 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     }
 
     private fun setupCameraFlashButton(supported: Collection<Flash>) {
-        if (cameraView.flash == Flash.AUTO) {
-            flashButton.displayFlashAuto()
-        } else if (cameraView.flash == Flash.OFF) {
-            flashButton.displayFlashOff()
-            flashButton.contentDescription = getString(R.string.action_enable_flash)
-        } else {
-            flashButton.displayFlashOn()
-            flashButton.contentDescription = getString(R.string.action_disable_flash)
+        when (cameraView.flash) {
+            Flash.AUTO -> {
+                flashButton.displayFlashAuto()
+            }
+
+            Flash.OFF -> {
+                flashButton.displayFlashOff()
+                flashButton.contentDescription = getString(R.string.action_enable_flash)
+            }
+
+            else -> {
+                flashButton.displayFlashOn()
+                flashButton.contentDescription = getString(R.string.action_disable_flash)
+            }
         }
-        flashButton.setOnClickListener { view: View? ->
+        flashButton.setOnClickListener {
             if (cameraView.mode == Mode.VIDEO) {
                 if (cameraView.flash == Flash.OFF && supported.contains(Flash.TORCH)) {
                     flashButton.displayFlashOn()
@@ -750,17 +759,15 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     }
 
     private fun setVideoQuality() {
-        if (cameraView != null && videoResolutionManager != null) {
+        if (videoResolutionManager != null) {
             cameraView.setVideoSize(videoResolutionManager!!.videoSize)
         }
     }
 
     private fun setVideoSize(videoSize: SizeSelector) {
-        if (cameraView != null) {
-            cameraView.setVideoSize(videoSize)
-            cameraView.close()
-            cameraView.open()
-        }
+        cameraView.setVideoSize(videoSize)
+        cameraView.close()
+        cameraView.open()
     }
 
     private fun scheduleFileUpload(vaultFile: VaultFile) {
@@ -776,21 +783,19 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     }
 
     private fun initView() {
-        with(binding) {
-            cameraView = camera
-            this@CameraActivity.gridButton = gridButton
-            this@CameraActivity.switchButton = switchButton
-            this@CameraActivity.flashButton = flashButton
-            this@CameraActivity.captureButton = captureButton
-            this@CameraActivity.durationView = durationView
-            mSeekBar = cameraZoom
-            this@CameraActivity.videoLine = videoLine
-            this@CameraActivity.photoLine = photoLine
-            previewView = previewImage
-            photoModeText = photoText
-            videoModeText = videoText
-            this@CameraActivity.resolutionButton = resolutionButton
-        }
+        cameraView = binding.camera
+        gridButton = binding.gridButton
+        switchButton = binding.switchButton
+        flashButton = binding.flashButton
+        captureButton = binding.captureButton
+        durationView = binding.durationView
+        mSeekBar = binding.cameraZoom
+        videoLine = binding.videoLine
+        photoLine = binding.photoLine
+        previewView = binding.previewImage
+        photoModeText = binding.photoText
+        videoModeText = binding.videoText
+        resolutionButton = binding.resolutionButton
     }
 
     enum class CameraMode {

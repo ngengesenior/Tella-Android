@@ -12,12 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
-//import androidx.hilt.work.HiltWorkerFactory;
 import androidx.hilt.work.HiltWorkerFactory;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.multidex.MultiDexApplication;
 import androidx.work.Configuration;
-//import androidx.work.Configuration;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -30,9 +28,7 @@ import com.hzontal.tella_locking_ui.ui.pattern.PatternUnlockActivity;
 import com.hzontal.tella_locking_ui.ui.pin.PinUnlockActivity;
 import com.hzontal.tella_vault.Vault;
 import com.hzontal.tella_vault.rx.RxVault;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.cleaninsights.sdk.CleanInsights;
+import org.hzontal.shared_ui.data.CommonPrefs;
 import org.hzontal.tella.keys.MainKeyStore;
 import org.hzontal.tella.keys.TellaKeys;
 import org.hzontal.tella.keys.config.IUnlockRegistryHolder;
@@ -47,11 +43,8 @@ import org.hzontal.tella.keys.wrapper.UnencryptedKeyWrapper;
 import org.witness.proofmode.ProofMode;
 import org.witness.proofmode.notaries.OpenTimestampsNotarizationProvider;
 import org.witness.proofmode.service.MediaWatcher;
-
-import java.security.Security;
-
+import java.io.File;
 import javax.inject.Inject;
-
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -63,8 +56,8 @@ import rs.readahead.washington.mobile.data.sharedpref.SharedPrefs;
 import rs.readahead.washington.mobile.javarosa.JavaRosa;
 import rs.readahead.washington.mobile.javarosa.PropertyManager;
 import rs.readahead.washington.mobile.media.MediaFileHandler;
+import rs.readahead.washington.mobile.util.C;
 import rs.readahead.washington.mobile.proofmode.storage.TellaProofModeStorageProvider;
-import rs.readahead.washington.mobile.util.CleanInsightUtils;
 import rs.readahead.washington.mobile.util.LocaleManager;
 import rs.readahead.washington.mobile.util.TellaUpgrader;
 import rs.readahead.washington.mobile.views.activity.ExitActivity;
@@ -82,7 +75,6 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
     private static MainKeyStore mainKeyStore;
     private static UnlockRegistry unlockRegistry;
     private static KeyDataSource keyDataSource;
-    private static CleanInsights cleanInsights;
     private final Long start = System.currentTimeMillis();
     @Inject
     public HiltWorkerFactory workerFactory;
@@ -150,12 +142,9 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         TellaKeysUI.getMainKeyHolder().set(mainKey);
     }
 
-    public static CleanInsights getCleanInsights() {
-        return cleanInsights;
-    }
-
     @Override
     protected void attachBaseContext(Context newBase) {
+        CommonPrefs.getInstance().init(newBase);
         SharedPrefs.getInstance().init(newBase);
         super.attachBaseContext(LocaleManager.getInstance().getLocalizedContext(newBase));
     }
@@ -196,8 +185,11 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
             apiBuilder.setLogLevelFull();
         }
         // todo: implement dagger2
+        CommonPrefs.getInstance().init(this);
         SharedPrefs.getInstance().init(this);
         configureCrashlytics();
+        System.loadLibrary("sqlcipher");
+
 
         // provide custom configuration
      /*   Configuration myConfig = new Configuration.Builder()
@@ -222,13 +214,11 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         MediaFileHandler.init(this);
         MediaFileHandler.emptyTmp(this);
 
-        /* evernote jobs */
-        //    JobManager.create(this).addJobCreator(new TellaJobCreator());
-        //  JobManager.instance().cancelAll(); // for testing, kill them all for now..
-
         // Collect
         PropertyManager mgr = new PropertyManager();
         JavaRosa.initializeJavaRosa(mgr);
+        vaultConfig = new Vault.Config();
+        vaultConfig.root = new File(this.getFilesDir(), C.MEDIA_DIR);
         //Tella keys
         TellaKeys.initialize();
         initializeLockConfigRegistry();
@@ -237,7 +227,6 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         mainKeyHolder = new LifecycleMainKey(ProcessLifecycleOwner.get().getLifecycle(), Preferences.getLockTimeout());
         keyDataSource = new KeyDataSource(getApplicationContext());
         TellaKeysUI.initialize(mainKeyStore, mainKeyHolder, unlockRegistry, this, Preferences.getFailedUnlockOption(), Preferences.getUnlockRemainingAttempts(), Preferences.isShowUnlockRemainingAttempts());
-        //initCleanInsights();
     }
 
     private void configureCrashlytics() {
@@ -280,7 +269,6 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         super.onLowMemory();
         super.onLowMemory();
         Glide.get(this).clearMemory();
-        persistCleanInsights();
     }
 
     @Override
@@ -349,43 +337,9 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         return unlockRegistry;
     }
 
-    /*  private void initCleanInsights() {
-          if (Preferences.hasAcceptedImprovements()) {
-              try {
-                  cleanInsights = createCleanInsightsInstance(getApplicationContext(), Preferences.getTimeAcceptedImprovements());
-              } catch (Exception e) {
-                  e.printStackTrace();
-              }
-          }
-      }
-  */
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        persistCleanInsights();
-    }
-
-    private void persistCleanInsights() {
-        if (Preferences.hasAcceptedImprovements() && cleanInsights != null)
-            CleanInsightUtils.INSTANCE.measureTimeSpentEvent(start);
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        persistCleanInsights();
-    }
-
     @NonNull
     @Override
     public Configuration getWorkManagerConfiguration() {
         return new Configuration.Builder().setMinimumLoggingLevel(android.util.Log.DEBUG).setWorkerFactory(workerFactory).build();
-    }
-
-    // This is added in the ProofMode library but seems not to be working
-    static {
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
     }
 }

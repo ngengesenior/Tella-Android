@@ -3,6 +3,7 @@ package rs.readahead.washington.mobile.data
 object ParamsNetwork {
     private const val URL_API = "/api/"
     const val URL_LOGIN = "${URL_API}login"
+    const val URL_THESAURIS = "${URL_API}thesauris"
     const val URL_TEMPLATES = "${URL_API}templates"
     const val URL_ENTITIES = "${URL_API}entities"
     const val URL_WHITE_LISTED_ENTITIES = "${URL_API}public"
@@ -17,5 +18,4 @@ object ParamsNetwork {
     const val URL_FEEDBACK: String = "https://api.feedback.tella-app.org/opinions/"
     const val FEEDBACK_HEADER = "X-Tella-Platform"
     const val TELLA_PLATFORM = "wearehorizontal"
-
 }

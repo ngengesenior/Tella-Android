@@ -42,7 +42,6 @@ class HomeVaultPresenter constructor(var view: IHomeVaultPresenter.IView?) :
         disposable.dispose()
         view = null
     }
-
     override fun executePanicMode() {
         keyDataSource.dataSource
             .subscribeOn(Schedulers.io())
@@ -55,7 +54,7 @@ class HomeVaultPresenter constructor(var view: IHomeVaultPresenter.IView?) :
                     dataSource.deleteDatabase()
                 } else {
                     if (Preferences.isEraseForms()) {
-                        dataSource.deleteForms()
+                        dataSource.deleteFormsAndRelatedTables()
                     }
                 }
                 clearSharedPreferences()
