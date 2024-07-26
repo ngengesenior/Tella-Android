@@ -1,0 +1,58 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="org.cleaninsights.sdk.test" >
+4
+5    <uses-sdk
+5-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:5:5-74
+6        android:minSdkVersion="24"
+6-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:5:15-41
+7        android:targetSdkVersion="34" />
+7-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:5:42-71
+8
+9    <instrumentation
+9-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:11:5-15:76
+10        android:name="androidx.test.runner.AndroidJUnitRunner"
+10-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:11:22-76
+11        android:functionalTest="false"
+11-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:14:22-52
+12        android:handleProfiling="false"
+12-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:13:22-53
+13        android:label="Tests for org.cleaninsights.sdk.test"
+13-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:15:22-74
+14        android:targetPackage="org.cleaninsights.sdk.test" />
+14-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:12:22-72
+15
+16    <application
+16-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:7:5-9:19
+17        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+17-->[androidx.core:core:1.7.0] /Users/ngengesenior/.gradle/caches/transforms-3/da256810a335a84c3644bc1a419e09a9/transformed/core-1.7.0/AndroidManifest.xml:24:18-86
+18        android:debuggable="true"
+19        android:extractNativeLibs="false" >
+20        <uses-library android:name="android.test.runner" />
+20-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:8:9-60
+20-->/Users/ngengesenior/StudioProjects/Tella-Android/clean-insights/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest17227594969927681556.xml:8:23-57
+21
+22        <provider
+22-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:26:9-34:20
+23            android:name="androidx.startup.InitializationProvider"
+23-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:27:13-67
+24            android:authorities="org.cleaninsights.sdk.test.androidx-startup"
+24-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:28:13-68
+25            android:exported="false" >
+25-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:29:13-37
+26            <meta-data
+26-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:31:13-33:52
+27                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+27-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:32:17-75
+28                android:value="androidx.startup" />
+28-->[androidx.emoji2:emoji2:1.0.0] /Users/ngengesenior/.gradle/caches/transforms-3/1248bd5b0ef0c14bdf2555874856b54e/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:33:17-49
+29            <meta-data
+29-->[androidx.lifecycle:lifecycle-process:2.4.0] /Users/ngengesenior/.gradle/caches/transforms-3/12edb130f59d42642796b6e7b0c63dbe/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:31:13-33:52
+30                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+30-->[androidx.lifecycle:lifecycle-process:2.4.0] /Users/ngengesenior/.gradle/caches/transforms-3/12edb130f59d42642796b6e7b0c63dbe/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:32:17-78
+31                android:value="androidx.startup" />
+31-->[androidx.lifecycle:lifecycle-process:2.4.0] /Users/ngengesenior/.gradle/caches/transforms-3/12edb130f59d42642796b6e7b0c63dbe/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:33:17-49
+32        </provider>
+33    </application>
+34
+35</manifest>
