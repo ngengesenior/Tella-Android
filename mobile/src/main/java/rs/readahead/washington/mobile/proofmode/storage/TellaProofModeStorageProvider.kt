@@ -2,6 +2,7 @@ package rs.readahead.washington.mobile.proofmode.storage
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.core.net.toFile
 import com.hzontal.tella_vault.VaultFile
 import org.apache.commons.io.IOUtils
@@ -9,6 +10,7 @@ import org.witness.proofmode.ProofMode
 import org.witness.proofmode.storage.StorageListener
 import org.witness.proofmode.storage.StorageProvider
 import rs.readahead.washington.mobile.MyApplication
+import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -62,6 +64,7 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
     @Throws(Exception::class)
     override fun proofIdentifierExists(hash: String?, identifier: String?): Boolean {
         val rootVault:VaultFile = getParentVaultFile(hash) ?: return false
+        Timber.d("Root vault ${rootVault.path}, ${rootVault.id}, ${rootVault.name}")
         return MyApplication.vault.list(rootVault)
             .any {
                 it.id == identifier
@@ -69,11 +72,11 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
 
     }
 
+
     private fun getProofVaultFiles(hash: String?): List<VaultFile> {
         val rootVault: VaultFile = getParentVaultFile(hash) ?: return emptyList()
         return MyApplication.vault?.list(rootVault) ?: emptyList()
     }
-
     override fun getProofSet(hash: String?): ArrayList<Uri> {
         val libProofSet = arrayListOf<Uri>()
         val rootVault: VaultFile? = getParentVaultFile(hash)

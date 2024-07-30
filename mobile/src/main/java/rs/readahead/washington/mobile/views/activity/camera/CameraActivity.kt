@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.net.toFile
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -276,7 +277,10 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     private fun generateProof(file:VaultFile) {
         val mediaFile = MyApplication.rxVault.getFile(file)
         val uri = EncryptedFileProvider.getUriForFile(applicationContext,EncryptedFileProvider.AUTHORITY,mediaFile)
-        MediaWatcher.getInstance(applicationContext).processUri(uri,file.hash,true, Date())
+
+        //Timber.d("The Uri is $uri, ${uri.toFile().exists()}")
+        ProofMode.generateProof(applicationContext,uri)
+        //MediaWatcher.getInstance(applicationContext).processUri(uri,file.hash,true, Date())
         //ProofMode.generateProof(applicationContext,uri,file.hash)
     }
 
@@ -579,6 +583,7 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(result: PictureResult) {
                 viewModel.addJpegPhoto(result.data, currentRootParent)
+                result.data
                 //TODO Generate proof
             }
 
