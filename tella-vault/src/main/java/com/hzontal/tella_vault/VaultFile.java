@@ -15,8 +15,18 @@ public class VaultFile  implements Serializable {
     public boolean anonymous;
     public Metadata metadata;
     public byte[] thumb;
+    public String parentId;
 
     public VaultFile() {
+    }
+
+    public VaultFile(String id) {
+        this.id = id;
+    }
+
+    public VaultFile(String parentId, String id) {
+        this.id = id;
+        this.parentId = parentId;
     }
 
     protected VaultFile(BaseVaultFileBuilder<?, ?> builder) {

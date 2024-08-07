@@ -2,8 +2,11 @@ package rs.readahead.washington.mobile.proofmode.storage
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.net.toFile
+import com.hzontal.tella_vault.Vault
+import com.hzontal.tella_vault.VaultException
 import com.hzontal.tella_vault.VaultFile
 import org.apache.commons.io.IOUtils
 import org.witness.proofmode.ProofMode
@@ -19,8 +22,11 @@ import java.io.OutputStream
 import java.nio.charset.Charset
 
 class TellaProofModeStorageProvider(private val context: Context):StorageProvider {
+
+
     override fun saveStream(hash: String?, identifier: String?, inputStream: InputStream?, storageListener: StorageListener?) {
         // The hash is the parent and the identifier is the file id
+        var vaultFile =
         MyApplication
             .vault
             .builder(inputStream)
@@ -28,6 +34,7 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
             // We need to set mime type
             .build(hash)
 
+        storageListener?.saveSuccessful(vaultFile.id)
 
     }
 
@@ -42,19 +49,33 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
         saveStream(hash,identifier,inputStream,storageListener)
     }
 
-    @Throws(FileNotFoundException::class,SecurityException::class)
+
     override fun getInputStream(hash: String?, identifier: String?): InputStream? {
-        val vaultFile = MyApplication.vault.builder(identifier)
-            .build(hash)
-        return MyApplication.vault.getStream(vaultFile)
-        //return MyApplication.rxVault.getStream(vaultFile)
+
+        try
+        {
+            val vaultFile = getVaultFile(hash, identifier)
+            return MyApplication.vault.getStream(vaultFile)
+        }
+        catch (_: VaultException)
+        {
+            return null
+        }
+
     }
 
 
-    override fun getOutputStream(hash: String?, identifier: String?): OutputStream {
-        val vaultFile = MyApplication.vault.builder(identifier)
-            .build(hash)
-       return MyApplication.vault.getOutStream(vaultFile)
+    override fun getOutputStream(hash: String?, identifier: String?): OutputStream? {
+        try
+        {
+            val vaultFile = MyApplication.vault.builder(identifier)
+                .build(hash)
+           return MyApplication.vault.getOutStream(vaultFile)
+        }
+        catch (_: VaultException)
+        {
+            return null
+        }
     }
 
     override fun proofExists(hash: String?): Boolean {
@@ -63,26 +84,31 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
 
     @Throws(Exception::class)
     override fun proofIdentifierExists(hash: String?, identifier: String?): Boolean {
-        val rootVault:VaultFile = getParentVaultFile(hash) ?: return false
-        Timber.d("Root vault ${rootVault.path}, ${rootVault.id}, ${rootVault.name}")
-        return MyApplication.vault.list(rootVault)
-            .any {
-                it.id == identifier
-            }
+
+        var vaultFile = getVaultFile(hash, identifier)
+        var fileActual = MyApplication.vault.getFile(vaultFile)
+        return fileActual.exists()
 
     }
 
+    private fun getVaultFile (hash: String?, identifier: String?) : VaultFile {
+        val vaultFile = VaultFile(hash, identifier)
+
+        vaultFile.mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(identifier);
+        if (vaultFile.mimeType.isNullOrEmpty())
+            vaultFile.mimeType = "application/octet-stream"
+
+        return vaultFile
+    }
 
     private fun getProofVaultFiles(hash: String?): List<VaultFile> {
-        val rootVault: VaultFile = getParentVaultFile(hash) ?: return emptyList()
-        return MyApplication.vault?.list(rootVault) ?: emptyList()
+        return MyApplication.vault?.list(VaultFile(hash)) ?: emptyList()
     }
     override fun getProofSet(hash: String?): ArrayList<Uri> {
         val libProofSet = arrayListOf<Uri>()
-        val rootVault: VaultFile? = getParentVaultFile(hash)
         getProofVaultFiles(hash)
             .forEach {
-
+                libProofSet.add(Uri.parse(it.path))
             }
 
         return libProofSet
@@ -94,9 +120,6 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
         } else null
     }
 
-    private fun getParentVaultFile(hash: String?):VaultFile? {
-        //MyApplication.vault.
-        return MyApplication.vault.builder(hash).build()
-    }
+
 
 }
