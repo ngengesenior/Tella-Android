@@ -219,6 +219,7 @@ public abstract class BaseVault {
                 FileUtil.close(builder.data);
                 FileUtil.close(os);
 
+                vaultFile.path = file.getPath();
                 vaultFile.hash = hexString(os.getMessageDigest().digest());
                 vaultFile.size = getSize(file);
             }

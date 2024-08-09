@@ -28,6 +28,9 @@ import com.hzontal.tella_locking_ui.ui.pattern.PatternUnlockActivity;
 import com.hzontal.tella_locking_ui.ui.pin.PinUnlockActivity;
 import com.hzontal.tella_vault.Vault;
 import com.hzontal.tella_vault.rx.RxVault;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPException;
 import org.hzontal.shared_ui.data.CommonPrefs;
 import org.hzontal.tella.keys.MainKeyStore;
 import org.hzontal.tella.keys.TellaKeys;
@@ -41,9 +44,13 @@ import org.hzontal.tella.keys.wrapper.AndroidKeyStoreWrapper;
 import org.hzontal.tella.keys.wrapper.PBEKeyWrapper;
 import org.hzontal.tella.keys.wrapper.UnencryptedKeyWrapper;
 import org.witness.proofmode.ProofMode;
+import org.witness.proofmode.crypto.pgp.PgpUtils;
 import org.witness.proofmode.notaries.OpenTimestampsNotarizationProvider;
 import org.witness.proofmode.service.MediaWatcher;
 import java.io.File;
+import java.io.IOException;
+import java.security.Security;
+
 import javax.inject.Inject;
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.functions.Consumer;
@@ -169,21 +176,36 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         //ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
         BaseApi.Builder apiBuilder = new BaseApi.Builder();
 
-        // Add BC provider if it is not added
-
-        // Set proof points
-        ProofMode.setProofPoints(this,true,true,true,true);
-        ProofMode.checkAndGeneratePublicKeyAsync(this,"default_password");
-        addNotarizationProviders();
-
-        // Tella storage provider
-        MediaWatcher.getInstance(this).setStorageProvider(new TellaProofModeStorageProvider(this));
         if (BuildConfig.DEBUG) {
             //  StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
             ///        .detectAll().penaltyLog()/*.penaltyDeath()*/.build()); // todo: catch those..
             Timber.plant(new Timber.DebugTree());
             apiBuilder.setLogLevelFull();
         }
+
+        // Add BC provider if it is not added
+
+        // Set proof points
+        //BouncyCastleProvider sProvider = new BouncyCastleProvider();
+        //Security.addProvider(sProvider);
+      //  Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        ProofMode.setProofPoints(this,true,true,true,true);
+        //ProofMode.checkAndGeneratePublicKeyAsync(this,""password);
+        String pubKey = null;
+
+        try {
+            pubKey = PgpUtils.getInstance(this, "password").getPublicKeyFingerprint();
+        } catch (PGPException var4) {
+                var4.printStackTrace();
+        } catch (IOException var5) {
+                var5.printStackTrace();
+        }
+
+        addNotarizationProviders();
+
+        // Tella storage provider
+        MediaWatcher.getInstance(this).setStorageProvider(new TellaProofModeStorageProvider(this));
+
         // todo: implement dagger2
         CommonPrefs.getInstance().init(this);
         SharedPrefs.getInstance().init(this);
