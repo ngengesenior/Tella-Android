@@ -14,6 +14,7 @@ object VaultSheetUtils {
     interface IVaultActions {
         fun upload()
         fun share()
+        fun shareProof()
         fun move()
         fun rename()
         fun save()
@@ -23,7 +24,7 @@ object VaultSheetUtils {
     }
 
     @JvmStatic
-    fun showVaultActionsSheet(fragmentManager: FragmentManager, titleText: String?, uploadLabel: String, shareLabel: String, moveLabel: String, renameLabel: String, saveLabel: String, infoLabel: String, deleteLabel: String, editLabel: String, isDirectory: Boolean = false, isMultipleFiles: Boolean = false, isUploadVisible: Boolean = false, isMoveVisible: Boolean = false, isEditVisible: Boolean = false, action: IVaultActions) {
+    fun showVaultActionsSheet(fragmentManager: FragmentManager, titleText: String?, uploadLabel: String, shareLabel: String,shareProofLabel: String, moveLabel: String, renameLabel: String, saveLabel: String, infoLabel: String, deleteLabel: String, editLabel: String, isDirectory: Boolean = false, isMultipleFiles: Boolean = false, isUploadVisible: Boolean = false, isMoveVisible: Boolean = false, isEditVisible: Boolean = false, action: IVaultActions) {
         val vaultActionSheet = CustomBottomSheetFragment.with(fragmentManager).page(R.layout.vault_actions_sheet_layout).cancellable(true).screenTag("vaultActionSheet")
         vaultActionSheet.holder(VaultActionsSheetHolder(), object : Binder<VaultActionsSheetHolder> {
             override fun onBind(holder: VaultActionsSheetHolder) {
@@ -36,6 +37,7 @@ object VaultSheetUtils {
                     if (isDirectory) {
                         seperator.visibility = View.GONE
                         actionShare.visibility = View.GONE
+                        actionShareProof.visibility = View.GONE
                         actionUpload.visibility = View.GONE
                         actionEdit.visibility = View.GONE
                     }
@@ -77,6 +79,11 @@ object VaultSheetUtils {
                         vaultActionSheet.dismiss()
                         action.share()
                     }
+                    actionShareProof.text = shareProofLabel
+                    actionShareProof.setOnClickListener {
+                        vaultActionSheet.dismiss()
+                        action.shareProof()
+                    }
                     //Move action
                     actionMove.isVisible = isMoveVisible
                     actionMove.text = moveLabel
@@ -109,6 +116,7 @@ object VaultSheetUtils {
         lateinit var actionDelete: TextView
         lateinit var actionUpload: TextView
         lateinit var actionShare: TextView
+        lateinit var actionShareProof: TextView
         lateinit var actionMove: TextView
         lateinit var actionInfo: TextView
         lateinit var actionSave: TextView
@@ -121,6 +129,7 @@ object VaultSheetUtils {
             actionDelete = view.findViewById(R.id.deleteActionTV)
             actionUpload = view.findViewById(R.id.uploadActionTV)
             actionShare = view.findViewById(R.id.shareActionTV)
+            actionShareProof = view.findViewById(R.id.shareProofActionTV)
             actionMove = view.findViewById(R.id.moveActionTV)
             actionInfo = view.findViewById(R.id.infoActionTV)
             actionSave = view.findViewById(R.id.saveActionTV)

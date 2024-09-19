@@ -3,9 +3,7 @@ package rs.readahead.washington.mobile.proofmode.storage
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import androidx.core.net.toFile
-import com.hzontal.tella_vault.Vault
 import com.hzontal.tella_vault.VaultException
 import com.hzontal.tella_vault.VaultFile
 import org.apache.commons.io.IOUtils
@@ -13,19 +11,20 @@ import org.witness.proofmode.ProofMode
 import org.witness.proofmode.storage.StorageListener
 import org.witness.proofmode.storage.StorageProvider
 import rs.readahead.washington.mobile.MyApplication
-import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.charset.Charset
+import java.util.Locale
 
 class TellaProofModeStorageProvider(private val context: Context):StorageProvider {
 
 
     override fun saveStream(hash: String?, identifier: String?, inputStream: InputStream?, storageListener: StorageListener?) {
         // The hash is the parent and the identifier is the file id
+        val theId = identifier
+        val theHash = hash
         var vaultFile =
         MyApplication
             .vault
@@ -84,9 +83,11 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
 
     @Throws(Exception::class)
     override fun proofIdentifierExists(hash: String?, identifier: String?): Boolean {
+        val theHash = hash?.lowercase()
+        val id = identifier?.lowercase()
 
-        var vaultFile = getVaultFile(hash, identifier)
-        var fileActual = MyApplication.vault.getFile(vaultFile)
+        val vaultFile = getVaultFile(theHash, id)
+        val fileActual = MyApplication.vault.getFile(vaultFile)
         return fileActual.exists()
 
     }
@@ -102,6 +103,8 @@ class TellaProofModeStorageProvider(private val context: Context):StorageProvide
     }
 
     private fun getProofVaultFiles(hash: String?): List<VaultFile> {
+        var theHash = hash
+        //MyApplication.rxVault.list()
         return MyApplication.vault?.list(VaultFile(hash)) ?: emptyList()
     }
     override fun getProofSet(hash: String?): ArrayList<Uri> {

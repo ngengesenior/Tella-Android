@@ -72,6 +72,7 @@ import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.
 import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.AttachmentsHelper.getCurrentType
 import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.AttachmentsHelper.hasStoragePermissions
 import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.AttachmentsHelper.setToolbarLabel
+import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.AttachmentsHelper.shareProofFiles
 import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.AttachmentsHelper.shareVaultFile
 import rs.readahead.washington.mobile.views.fragment.vault.attachements.helpers.AttachmentsHelper.shareVaultFiles
 import rs.readahead.washington.mobile.views.fragment.vault.edit.VaultEditFragment
@@ -562,6 +563,7 @@ class AttachmentsFragment :
             getSheetName(vaultFile, isMultipleFiles),
             getString(R.string.Vault_Upload_SheetAction),
             getString(R.string.Vault_Share_SheetAction),
+            getString(R.string.Vault_Share_Proof_SheetAction),
             getString(R.string.Vault_Move_SheetDesc),
             getString(R.string.Vault_Rename_SheetAction),
             getString(R.string.gallery_action_desc_save_to_device),
@@ -594,6 +596,12 @@ class AttachmentsFragment :
                         } else {
                             shareVaultFile(vaultFile, baseActivity)
                         }
+                    }
+                }
+
+                override fun shareProof() {
+                    baseActivity.maybeChangeTemporaryTimeout {
+                        shareProofFiles(vaultFile, baseActivity)
                     }
                 }
 

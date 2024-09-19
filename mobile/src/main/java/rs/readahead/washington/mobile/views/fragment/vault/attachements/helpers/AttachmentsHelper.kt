@@ -95,4 +95,13 @@ object AttachmentsHelper {
             MediaFileHandler.startShareActivity(activity, vaultFile, false)
         }
     }
+
+    internal fun shareProofFiles(vaultFile: VaultFile?, activity: BaseActivity) {
+        if (vaultFile == null) {
+            return
+        }
+
+        MediaFileHandler.startShareProofActivity(activity,vaultFile)
+
+    }
 }

@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
@@ -40,6 +41,8 @@ import com.hzontal.utils.MediaFile;
 
 import org.apache.commons.io.IOUtils;
 import org.hzontal.shared_ui.utils.DialogUtils;
+import org.witness.proofmode.ProofMode;
+import org.witness.proofmode.service.MediaWatcher;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -67,6 +70,7 @@ import rs.readahead.washington.mobile.R;
 import rs.readahead.washington.mobile.data.provider.EncryptedFileProvider;
 import rs.readahead.washington.mobile.data.sharedpref.Preferences;
 import rs.readahead.washington.mobile.presentation.entity.mapper.PublicMetadataMapper;
+import rs.readahead.washington.mobile.proofmode.storage.TellaProofModeStorageProvider;
 import rs.readahead.washington.mobile.util.C;
 import rs.readahead.washington.mobile.util.FileUtil;
 import timber.log.Timber;
@@ -631,6 +635,23 @@ public class MediaFileHandler {
         shareIntent.putExtra(Intent.EXTRA_STREAM, mediaFileUri);
 
         context.startActivity(chooser);
+    }
+
+    public static void startShareProofActivity(Context context, VaultFile vaultFile) {
+        var provider  = MyApplication.getProofModeStorageProvider();
+        var theParentId = vaultFile.parentId;
+        var files = MyApplication.vault.list(vaultFile);
+        if (provider.proofExists(vaultFile.hash)) {
+            var proofSet = provider.getProofSet(vaultFile.hash.toLowerCase());
+            var size = proofSet.size();
+
+
+        }
+
+
+
+
+        //Timber.d("Proof exists? %s", provider.proofExists(vaultFile.hash));
     }
 
     public static void startShareActivity(Context context, List<VaultFile> mediaFiles, boolean includeMetadata) {

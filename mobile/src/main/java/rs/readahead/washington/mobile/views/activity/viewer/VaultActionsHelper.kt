@@ -74,6 +74,16 @@ object VaultActionsHelper {
             }
 
             /**
+             * TODO: Placeholder for the share proof action.
+             */
+            override fun shareProof() {
+                this@showVaultActionsDialog.maybeChangeTemporaryTimeout {
+                    // TODO: Implement share proof action
+                    shareMediaFileProof()
+                }
+            }
+
+            /**
              * Placeholder for the move action.
              */
             override fun move() {
@@ -169,6 +179,7 @@ object VaultActionsHelper {
             chosenVaultFile.name,
             getString(R.string.Vault_Upload_SheetAction),
             getString(R.string.Vault_Share_SheetAction),
+            getString(R.string.Vault_Share_Proof_SheetAction),
             getString(R.string.Vault_Move_SheetDesc),
             getString(R.string.Vault_Rename_SheetAction),
             getString(R.string.gallery_action_desc_save_to_device),
@@ -192,6 +203,10 @@ object VaultActionsHelper {
         } else {
             startShareActivity(false)
         }
+    }
+
+    fun BaseActivity.shareMediaFileProof() {
+        startShareProof()
     }
 
     private fun BaseActivity.showShareWithMetadataDialog() {
@@ -220,6 +235,14 @@ object VaultActionsHelper {
             return
         }
         MediaFileHandler.startShareActivity(this, chosenVaultFile, includeMetadata)
+    }
+
+    private fun BaseActivity.startShareProof(){
+        if (chosenVaultFile == null) {
+            return
+        }
+
+        MediaFileHandler.startShareProofActivity(this, chosenVaultFile)
     }
 
 

@@ -85,8 +85,9 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
     private final Long start = System.currentTimeMillis();
     @Inject
     public HiltWorkerFactory workerFactory;
+    @SuppressLint("StaticFieldLeak")
+    private static TellaProofModeStorageProvider proofModeStorageProvider;
     Vault.Config vaultConfig;
-
     public static void startMainActivity(@NonNull Context context) {
         Intent intent;
         if (Preferences.isFirstStart()) {
@@ -167,6 +168,10 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
 
     }
 
+    public static TellaProofModeStorageProvider getProofModeStorageProvider() {
+        return proofModeStorageProvider;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -202,9 +207,9 @@ public class MyApplication extends MultiDexApplication implements IUnlockRegistr
         }
 
         addNotarizationProviders();
-
+         proofModeStorageProvider = new TellaProofModeStorageProvider(this);
         // Tella storage provider
-        MediaWatcher.getInstance(this).setStorageProvider(new TellaProofModeStorageProvider(this));
+        MediaWatcher.getInstance(this).setStorageProvider(proofModeStorageProvider);
 
         // todo: implement dagger2
         CommonPrefs.getInstance().init(this);
