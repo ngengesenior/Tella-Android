@@ -51,6 +51,7 @@ import rs.readahead.washington.mobile.mvp.presenter.MetadataAttacher
 import rs.readahead.washington.mobile.mvvm.viewmodel.TellaFileUploadSchedulerViewModel
 import rs.readahead.washington.mobile.util.C
 import rs.readahead.washington.mobile.util.DialogsUtil
+import rs.readahead.washington.mobile.util.SimpleC2paUtils
 import rs.readahead.washington.mobile.util.VideoResolutionManager
 import rs.readahead.washington.mobile.views.activity.MainActivity
 import rs.readahead.washington.mobile.views.activity.MetadataActivity
@@ -540,6 +541,12 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
     }
 
     private fun showConfirmVideoView(video: File) {
+        //TODO 2 Add C2pa to video file
+        try{
+            SimpleC2paUtils.generateC2pa(video,applicationContext)
+        } catch (ex:Exception){
+            ex.printStackTrace()
+        }
         displayVideoCaptureButton()
         durationView.stop()
         viewModel.addMp4Video(video, currentRootParent)
@@ -565,7 +572,16 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         setOrientationListener()
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(result: PictureResult) {
-                viewModel.addJpegPhoto(result.data, currentRootParent)
+                //TODO:1 Add C2pa before adding jpeg
+                val jpeg = result.data
+                try {
+                    SimpleC2paUtils.generateC2pa(jpeg,applicationContext)
+                    viewModel.addJpegPhoto(jpeg, currentRootParent)
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    viewModel.addJpegPhoto(result.data, currentRootParent)
+                }
+
             }
 
             override fun onVideoTaken(result: VideoResult) {
