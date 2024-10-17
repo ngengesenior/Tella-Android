@@ -73,6 +73,7 @@ buildscript {
     versions.googlePlayServices = "17.0.0"
     versions.pdf_viewer = "2.8.2"
     versions.divviup = "0.2.0"
+    versions.simpleC2paVersion = '0.0.14'
 
     repositories {
         mavenCentral()
@@ -105,6 +106,9 @@ allprojects {
             url "https://oss.sonatype.org/content/repositories/snapshots"
         }
         maven { url 'https://jitpack.io' }
+        // The gaurdian maven repository
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+        maven { url 'https://gitlab.com/api/v4/projects/51891540/packages/maven'  }
         google()  // Google's Maven repository
     }
 }

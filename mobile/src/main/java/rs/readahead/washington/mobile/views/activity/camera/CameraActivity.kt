@@ -51,6 +51,7 @@ import rs.readahead.washington.mobile.mvp.presenter.MetadataAttacher
 import rs.readahead.washington.mobile.mvvm.viewmodel.TellaFileUploadSchedulerViewModel
 import rs.readahead.washington.mobile.util.C
 import rs.readahead.washington.mobile.util.DialogsUtil
+import rs.readahead.washington.mobile.util.SimpleC2paUtils
 import rs.readahead.washington.mobile.util.VideoResolutionManager
 import rs.readahead.washington.mobile.views.activity.MainActivity
 import rs.readahead.washington.mobile.views.activity.MetadataActivity
@@ -537,10 +538,13 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         return false
     }
 
-    private fun showConfirmVideoView(video: File) {
+    private fun showConfirmVideoView(videoResult: VideoResult) {
+        //TODO 2 Add C2pa to video file
+        val video = SimpleC2paUtils.generateC2pa(videoResult, applicationContext)
         displayVideoCaptureButton()
         durationView.stop()
-        viewModel.addMp4Video(video, currentRootParent)
+        // Attempt adding the video with embedded c2pa
+        viewModel.addMp4Video(video ?: videoResult.file, currentRootParent)
     }
 
     /* handle display settings for the video capture button.*/
@@ -563,11 +567,13 @@ class CameraActivity : MetadataActivity(), IMetadataAttachPresenterContract.IVie
         setOrientationListener()
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(result: PictureResult) {
-                viewModel.addJpegPhoto(result.data, currentRootParent)
+                //TODO:1 Add C2pa before adding jpeg
+                val jpeg = SimpleC2paUtils.generateC2pa(result, applicationContext)
+                viewModel.addJpegPhoto(jpeg ?: result.data, currentRootParent)
             }
 
             override fun onVideoTaken(result: VideoResult) {
-                showConfirmVideoView(result.file)
+                showConfirmVideoView(result)
             }
 
             override fun onCameraError(exception: CameraException) {
